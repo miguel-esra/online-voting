@@ -42,7 +42,7 @@
         <?php endif; ?>
 
         <div class="input-group custom">
-            <input type="number" class="form-control form-control-lg" placeholder="Dígito Verificador" name="check_digit" value="<?= set_value('check_digit') ?>">
+            <input type="number" class="form-control form-control-lg" placeholder="Dígito Verificador" name="check_digit" value="<?= set_value('check_digit') ?>" autocomplete="off">
             <div class="input-group-append custom">
                 <span class="input-group-text"><i class="dw dw-padlock1"></i></span>
             </div>

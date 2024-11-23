@@ -38,4 +38,20 @@ class VoterController extends BaseController
         CIAuth::forgetVoter();
         return redirect()->route('user.login.form')->with('fail', 'Sesión finalizada.');
     }
+
+    public function settings()
+    {
+        $data = [
+            'pageTitle' => 'Votación Virtual'
+        ];
+        return view('backend/pages/settings', $data);
+    }
+
+    public function profile()
+    {
+        $data = array(
+            'pageTitle' => 'Votación Virtual'
+        );
+        return view('backend/pages/profile', $data);
+    }
 }

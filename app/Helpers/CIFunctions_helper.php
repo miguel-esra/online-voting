@@ -1,6 +1,7 @@
 <?php
 
 use App\Libraries\CIAuth;
+use App\Models\Candidate;
 use App\Models\User;
 use App\Models\Voter;
 use App\Models\Setting;
@@ -35,8 +36,8 @@ if ( !function_exists('get_settings') ) {
 
         if ( !$settings_data ) {
             $data = array(
-                'blog_title' => 'Tax Management',
-                'blog_email' => 'info@taxmanagement.test',
+                'blog_title' => 'Ventora Digital',
+                'blog_email' => 'info@ventoradigital.com',
                 'blog_phone' => null,
                 'blog_meta_keywords' => null,
                 'blog_meta_description' => null,
@@ -74,5 +75,26 @@ if ( !function_exists('get_social_media') ) {
             $result = $social_media_data;
         }
         return $result;
+    }
+}
+
+if ( !function_exists('current_route_name') ) {
+    function current_route_name() {
+        $router = \Config\Services::router();
+        $route_name = $router->getMatchedRouteOptions()['as'];
+        return $route_name;
+    }
+}
+
+if ( !function_exists('get_candidates') ) {
+    function get_candidates() {
+        $candidates = new Candidate();
+        $candidates_data = $candidates->asObject()->findAll();
+
+        if ( !$candidates_data ) {
+            return null;
+        } else {
+            return $candidates_data;
+        }
     }
 }

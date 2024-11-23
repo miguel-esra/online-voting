@@ -21,15 +21,13 @@
                     <span class="user-icon">
                         <?php if (!empty(get_voter())) : ?>
                             <img src="/images/users/default-avatar.png" alt="" class="ci-avatar-photo" />
-                        <?php endif; ?>
-                        <?php if (!empty(get_user())) : ?>
+                        <?php else : ?>
                             <img src="<?= get_user()->picture == null ? '/images/users/default-avatar.png' : '/images/users/' . get_user()->picture ?>" alt="" class="ci-avatar-photo" />
                         <?php endif; ?>
                     </span>
                     <?php if (!empty(get_voter())) : ?>
                         <span class="user-name ci-user-name"><?= get_voter()->name ?></span>
-                    <?php endif; ?>
-                    <?php if (!empty(get_user())) : ?>
+                    <?php else : ?>
                         <span class="user-name ci-user-name"><?= get_user()->name ?></span>
                     <?php endif; ?>
                 </a>

@@ -1,6 +1,6 @@
 <div class="left-side-bar">
     <div class="brand-logo">
-        <a href="<?= route_to('user.home') ?>">
+        <a href="<?= route_to('user.home') ?>" style="padding-left: 2em;">
             <img src="/images/blog/<?= get_settings()->blog_logo ?>" alt="" class="dark-logo" />
             <img src="/images/blog/<?= get_settings()->blog_logo ?>" alt="" class="light-logo" />
         </a>
@@ -12,13 +12,13 @@
         <div class="sidebar-menu">
             <ul id="accordion-menu">
                 <li>
-                    <a href="<?= route_to('user.home'); ?>" class="dropdown-toggle no-arrow">
+                    <a href="<?= route_to('user.home'); ?>" class="dropdown-toggle no-arrow <?= current_route_name() == 'user.home' ? 'active' : '' ?>">
                         <span class="micon dw dw-home"></span>
-                        <span class="mtext">Inicio</span>
+                        <span class="mtext">Votación</span>
                     </a>
                 </li>
                 <li>
-                    <a href="<?= route_to('categories'); ?>" class="dropdown-toggle no-arrow">
+                    <a href="<?= route_to('categories'); ?>" class="dropdown-toggle no-arrow <?= current_route_name() == 'categories' ? 'active' : '' ?>">
                         <span class="micon dw dw-clipboard1"></span>
                         <span class="mtext">Mi Voto</span>
                     </a>
@@ -40,13 +40,13 @@
                     <div class="sidebar-small-cap">Ajustes</div>
                 </li>
                 <li>
-                    <a href="<?= route_to('user.profile'); ?>" class="dropdown-toggle no-arrow">
+                    <a href="<?= route_to('user.profile'); ?>" class="dropdown-toggle no-arrow <?= current_route_name() == 'user.profile' ? 'active' : '' ?>">
                         <span class="micon dw dw-user"></span>
                         <span class="mtext">Perfil</span>
                     </a>
                 </li>
                 <li>
-                    <a href="<?= route_to('settings'); ?>" class="dropdown-toggle no-arrow">
+                    <a href="<?= route_to('user.settings'); ?>" class="dropdown-toggle no-arrow <?= current_route_name() == 'user.settings' ? 'active' : '' ?>">
                         <span class="micon dw dw-settings"></span>
                         <span class="mtext">Ajustes</span>
                     </a>

@@ -13,6 +13,8 @@ $routes->group('', static function($routes) {
     $routes->group('', ['filter' => 'cifilter:authVoter'], static function($routes) {
         $routes->get('votacion-virtual/inicio', 'VoterController::index', ['as' => 'user.home']);
         $routes->get('votacion-virtual/salir', 'VoterController::logoutHandler', ['as' => 'user.logout']);
+        $routes->get('votacion-virtual/ajustes', 'VoterController::settings', ['as' => 'user.settings']);
+        $routes->get('votacion-virtual/perfil', 'VoterController::profile', ['as' => 'user.profile']);
     });
     
     $routes->group('', ['filter' => 'cifilter:guestVoter'], static function($routes) {

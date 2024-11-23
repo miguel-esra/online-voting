@@ -46,6 +46,7 @@
 		</div>
 		<div class="login-wrap d-flex align-items-center flex-wrap justify-content-center">
 			<div class="container">
+				<h2 class="text-center text-info">Elecciones Municipales 2024</h2>
 				<div class="row align-items-center">
 					<div class="col-md-6 col-lg-7">
 						<img src="/backend/vendors/images/login-page-img.png" alt="" />

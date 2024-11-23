@@ -5,15 +5,15 @@
     <div class="row">
         <div class="col-md-12 col-sm-12">
             <div class="title">
-                <h4>Profile</h4>
+                <h4>Perfil</h4>
             </div>
             <nav aria-label="breadcrumb" role="navigation">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="<?= route_to('admin.home'); ?>">Home</a>
+                        <a href="<?= route_to('user.home'); ?>">Inicio</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        Profile
+                        Perfil
                     </li>
                 </ol>
             </nav>
@@ -25,13 +25,27 @@
     <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-30">
         <div class="pd-20 card-box height-100-p">
             <div class="profile-photo">
-                <a href="javascript:;" onclick="event.preventDefault(); document.getElementById('user_profile_file').click();" class="edit-avatar"><i class="fa fa-pencil"></i></a>
+                <a href="javascript:;" onclick="event.preventDefault(); document.getElementById('user_profile_file').click();" class="edit-avatar" style="display: none;"><i class="fa fa-pencil"></i></a>
                 <input type="file" name="user_profile_file" id="user_profile_file" class="d-none" style="opacity: 0;">
-                <img src="<?= get_user()->picture == null ? '/images/users/default-avatar.png' : '/images/users/' . get_user()->picture ?>" alt="" class="avatar-photo ci-avatar-photo"> 
+                <?php if (!empty(get_voter())) : ?>
+                    <img src="/images/users/default-avatar.png" alt="" class="avatar-photo ci-avatar-photo" />
+                <?php else : ?>
+                    <img src="<?= get_user()->picture == null ? '/images/users/default-avatar.png' : '/images/users/' . get_user()->picture ?>" alt="" class="avatar-photo ci-avatar-photo">
+                <?php endif; ?> 
             </div>
-            <h5 class="text-center h5 mb-0 ci-user-name"><?= get_user()->name ?></h5>
+            <h5 class="text-center h5 mb-0 ci-user-name">
+                <?php if (!empty(get_voter())) : ?>    
+                    <?= get_voter()->name ?>
+                <?php else : ?>
+                    <?= get_user()->name ?>
+                <?php endif; ?>
+            </h5>
             <p class="text-center text-muted font-14 ci-user-email">
-                <?= get_user()->email ?>
+                <?php if (!empty(get_voter())) : ?>    
+                    <?= 'Votante' ?>
+                <?php else : ?>
+                    <?= get_user()->email ?>
+                <?php endif; ?>
             </p>
         </div>
     </div>
@@ -41,10 +55,10 @@
                 <div class="tab height-100-p">
                     <ul class="nav nav-tabs customtab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" data-toggle="tab" href="#personal_details" role="tab">Personal Details</a>
+                            <a class="nav-link active" data-toggle="tab" href="#personal_details" role="tab">Datos Personales</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#change_password" role="tab">Change Password</a>
+                            <a class="nav-link" data-toggle="tab" href="#change_password" role="tab">Cambiar Contraseña</a>
                         </li>
                     </ul>
                     <div class="tab-content">
@@ -59,26 +73,38 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="">Name</label>
-                                                <input type="text" name="name" class="form-control" placeholder="Enter full name" value="<?= get_user()->name ?>">
+                                                <label for="">Nombre</label>
+                                                <?php if (!empty(get_voter())) : ?>    
+                                                    <input type="text" name="name" class="form-control" placeholder="Enter full name" value="<?= get_voter()->name ?>" readonly>
+                                                <?php else : ?>
+                                                    <input type="text" name="name" class="form-control" placeholder="Enter full name" value="<?= get_user()->name ?>" readonly>
+                                                <?php endif; ?>
                                                 <span class="text-danger error-text name_error"></span>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="">Username</label>
-                                                <input type="text" name="username" class="form-control" placeholder="Enter username" value="<?= get_user()->username ?>">
+                                                <label for="">DNI</label>
+                                                <?php if (!empty(get_voter())) : ?>    
+                                                    <input type="text" name="username" class="form-control" placeholder="Enter username" value="<?= get_voter()->user_id ?>" readonly>
+                                                <?php else : ?>
+                                                    <input type="text" name="username" class="form-control" placeholder="Enter username" value="<?= get_user()->username ?>" readonly>
+                                                <?php endif; ?>
                                                 <span class="text-danger error-text username_error"></span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="">Bio</label>
-                                        <textarea name="bio" id="" cols="30" rows="10" class="form-control" placeholder="Bio..."><?= get_user()->bio ?></textarea>
+                                        <label for="">Biografía</label>
+                                        <?php if (!empty(get_voter())) : ?>    
+                                            <textarea name="bio" id="" cols="30" rows="10" class="form-control" placeholder="Bio..." readonly>&nbsp;</textarea>
+                                        <?php else : ?>
+                                            <textarea name="bio" id="" cols="30" rows="10" class="form-control" placeholder="Bio..." readonly><?= get_user()->bio ?></textarea>
+                                        <?php endif; ?>
                                         <span class="text-danger error-text bio_error"></span>
                                     </div>
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    <div class="form-group" style="display: none;">
+                                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
                                     </div>
 
                                 </form>
@@ -94,8 +120,8 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="">Current password</label>
-                                                <input type="password" class="form-control" placeholder="Enter current password" name="current_password">
+                                                <label for="">Contraseña actual</label>
+                                                <input type="password" class="form-control" placeholder="Ingrese la contraseña actual" name="current_password" readonly>
                                                 <span class="text-danger error-text current_password_error"></span>
                                             </div>
                                         </div>
@@ -104,21 +130,21 @@
                                         <!-- End empty div -->
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="">New password</label>
-                                                <input type="password" class="form-control" placeholder="Enter new password" name="new_password">
+                                                <label for="">Nueva contraseña</label>
+                                                <input type="password" class="form-control" placeholder="Ingrese la nueva contraseña" name="new_password" readonly>
                                                 <span class="text-danger error-text new_password_error"></span>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="">Confirm new password</label>
-                                                <input type="password" class="form-control" placeholder="Retype new password" name="confirm_new_password">
+                                                <label for="">Confirmar nueva contraseña</label>
+                                                <input type="password" class="form-control" placeholder="Vuelva a escribir la nueva contraseña" name="confirm_new_password" readonly>
                                                 <span class="text-danger error-text confirm_new_password_error"></span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary">Change password</button>
+                                    <div class="form-group" style="display: none;">
+                                        <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
                                     </div>
                                 </form>
                             </div>
