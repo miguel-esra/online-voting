@@ -4,6 +4,7 @@ use App\Libraries\CIAuth;
 use App\Models\Candidate;
 use App\Models\User;
 use App\Models\Voter;
+use App\Models\Results;
 use App\Models\Setting;
 use App\Models\SocialMedia;
 
@@ -95,6 +96,17 @@ if ( !function_exists('get_candidates') ) {
             return null;
         } else {
             return $candidates_data;
+        }
+    }
+}
+
+if ( !function_exists('get_voter_choice') ) {
+    function get_voter_choice() {
+        if ( CIAuth::checkVoter() ) {
+            $result = new Results();
+            return $result->asObject()->where('user_id', CIAuth::userIdVoter())->first();
+        } else {
+            return null;
         }
     }
 }

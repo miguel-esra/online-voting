@@ -26,7 +26,27 @@
         <?= $this->renderSection('stylesheets') ?>
 		<style>
 			.swal2-popup{
-				font-size: .87em;
+				font-size: .80em;
+			}
+			.hide-box{
+				display: none;
+			}
+			.label-radio{
+				text-align: center;
+				box-shadow: 0px 4px 14px -4px rgba(0, 0, 0, 0.35);
+				padding: 1em 1.3em 1em 1.3em;
+				border: 3px solid #fff;
+				cursor: pointer;
+				transition: all 0.3s ease-in;
+				border-radius: 40px;
+			}
+			input[type=radio]:checked + .label-radio{
+				border-color: #8FD14F;
+				border: 3px solid #8FD14F;
+			}
+			body #toast-container > div {
+				opacity: 0.96;
+				margin-top: 5em;
 			}
 		</style>
     </head>

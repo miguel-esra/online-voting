@@ -64,6 +64,20 @@ class CIAuth
         }
     }
 
+    public static function userIdVoter()
+    {
+        $session    = session();
+        if ($session->has('logged_in_voter')) {
+            if ($session->has('userdata')) {
+                return $session->get('userdata')['user_id'];
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
     public static function forget() 
     {
         $session    = session();

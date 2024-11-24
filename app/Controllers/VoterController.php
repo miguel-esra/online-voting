@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Libraries\CIAuth;
 use App\Models\Voter;
+use App\Models\Results;
 use Config\Services;
 USE App\Libraries\Hash;
 use App\Models\Setting;
@@ -53,5 +54,32 @@ class VoterController extends BaseController
             'pageTitle' => 'Votación Virtual'
         );
         return view('backend/pages/profile', $data);
+    }
+
+    public function myVote()
+    {
+        $data = [
+            'pageTitle' => 'Votación Virtual',
+        ];
+        return view('backend/pages/my-vote', $data);
+    }
+
+    public function addVote()
+    {
+        $request = \Config\Services::request();
+
+        $result = new Results();
+        $voter = CIAuth::voter();
+        $data = [
+            'user_id' => $voter->user_id,
+            'candidate_number' => $request->getVar('candidate_number')
+        ];
+        $save = $result->save($data);
+
+        if ( $save ) {
+            return $this->response->setJSON(['status' => 1, 'msg' => 'Voto registrado correctamente.']);
+        } else {
+            return $this->response->setJSON(['status' => 0, 'msg' => 'Algo salió mal. Intente nuevamente.']);
+        }
     }
 }

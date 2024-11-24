@@ -15,6 +15,8 @@ $routes->group('', static function($routes) {
         $routes->get('votacion-virtual/salir', 'VoterController::logoutHandler', ['as' => 'user.logout']);
         $routes->get('votacion-virtual/ajustes', 'VoterController::settings', ['as' => 'user.settings']);
         $routes->get('votacion-virtual/perfil', 'VoterController::profile', ['as' => 'user.profile']);
+        $routes->post('votacion-virtual/registrar-voto', 'VoterController::addVote', ['as' => 'user.add-vote']);
+        $routes->get('votacion-virtual/mi-voto', 'VoterController::myVote', ['as' => 'user.my.vote']);
     });
     
     $routes->group('', ['filter' => 'cifilter:guestVoter'], static function($routes) {
