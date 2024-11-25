@@ -18,7 +18,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?= route_to('user.my.vote'); ?>" class="dropdown-toggle no-arrow <?= current_route_name() == 'categories' ? 'active' : '' ?>">
+                    <a href="<?= route_to('user.my.vote'); ?>" class="dropdown-toggle no-arrow <?= current_route_name() == 'user.my.vote' ? 'active' : '' ?>">
                         <span class="micon dw dw-clipboard1"></span>
                         <span class="mtext">Mi Voto</span>
                     </a>

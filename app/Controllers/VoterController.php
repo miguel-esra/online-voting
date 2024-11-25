@@ -58,9 +58,17 @@ class VoterController extends BaseController
 
     public function myVote()
     {
+        $userIdVoter = CIAuth::userIdVoter();
+        $result = new Results();
+        $voterChoice = $result->asObject()->where('user_id', $userIdVoter)->first();
+
+        $voterChoice ? $voteSuccess = true : $voteSuccess = false;
+        
         $data = [
             'pageTitle' => 'Votación Virtual',
+            'voteSuccess' => $voteSuccess
         ];
+       
         return view('backend/pages/my-vote', $data);
     }
 

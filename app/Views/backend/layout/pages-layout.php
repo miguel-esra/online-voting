@@ -26,7 +26,11 @@
         <?= $this->renderSection('stylesheets') ?>
 		<style>
 			.swal2-popup{
-				font-size: .80em;
+				font-size: .92em;
+			}
+			.swal2-title {
+				font-size: 24px !important;
+				padding-bottom: 0.3em !important;
 			}
 			.hide-box{
 				display: none;
@@ -47,6 +51,38 @@
 			body #toast-container > div {
 				opacity: 0.96;
 				margin-top: 5em;
+			}
+			.vote-href {
+				color: white;
+			}
+			.vote-href:hover {
+				color: white;
+				font-weight: 600;
+			}
+			.wrap-svg {
+				margin: 30px;
+			}
+			#circle-vote-svg {
+				stroke-dashoffset: 1000;
+				stroke-dasharray: 1000;
+				animation-name: success-svg;
+				animation-duration: 4s;
+				animation-timing-function: ease-in-out;
+				animation-fill-mode: forwards;
+			}
+			#check-vote-svg {
+				stroke-dashoffset: 1000;
+				stroke-dasharray: 1000;
+				animation-name: success-svg;
+				animation-duration: 4s;
+				animation-timing-function: ease-in-out;
+				animation-fill-mode: forwards;
+				animation-delay: 1s;
+			}
+			@keyframes success-svg {
+				to {
+					stroke-dashoffset: 0;
+				}
 			}
 		</style>
     </head>

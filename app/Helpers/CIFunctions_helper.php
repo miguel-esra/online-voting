@@ -110,3 +110,16 @@ if ( !function_exists('get_voter_choice') ) {
         }
     }
 }
+
+if ( !function_exists('get_voter_choice_details') ) {
+    function get_voter_choice_details() {
+        if ( CIAuth::checkVoter() ) {
+            $result = new Results();
+            $candidate_number = $result->asObject()->where('user_id', CIAuth::userIdVoter())->first()->candidate_number;
+            $candidate = new Candidate();
+            return $candidate->asObject()->where('candidate_number', $candidate_number)->first();
+        } else {
+            return null;
+        }
+    }
+}

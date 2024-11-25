@@ -23,7 +23,7 @@
 
 <div class="card-box pd-20 height-100-p mb-30">
     <div class="row align-items-center">
-        <div class="col-md-4">
+        <div class="col-md-4 text-center">
             <img src="/backend/vendors/images/banner-img.png" alt="">
         </div>
         <div class="col-md-8">
@@ -48,7 +48,7 @@
             <div class="card-body">
                 <h5 class="card-title text-white">Voto registrado correctamente</h5>
                 <p class="card-text">
-                    Para mayor información sobre tu voto, ingresa al enlace "Mi Voto".
+                    Para mayor información sobre tu voto, ingresa al enlace "<a class="card-text vote-href" href="<?= route_to('user.my.vote') ?>">Mi Voto</a>".
                 </p>
             </div>
         </div>

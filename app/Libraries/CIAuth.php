@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Libraries;
+
+use App\Models\Results;
 use App\Models\User;
 use App\Models\Voter;
 
