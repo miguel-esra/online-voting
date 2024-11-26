@@ -70,76 +70,76 @@ class AuthController extends BaseController
         }
     }
 
-    // // public function loginForm()
-    // // {
-    // //     $data = [
-    // //         'pageTitle' => 'Login',
-    // //         'validation' => null
-    // //     ];
+    public function loginForm()
+    {
+        $data = [
+            'pageTitle' => 'Votación Virtual',
+            'validation' => null
+        ];
 
-    // //     return view('backend/pages/auth/login', $data);
-    // // }
+        return view('backend/pages/auth/login', $data);
+    }
 
-    // public function loginHandler()
-    // {
-    //     $fieldType = filter_var($this->request->getVar('login_id'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+    public function loginHandler()
+    {
+        $fieldType = filter_var($this->request->getVar('login_id'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-    //     if ($fieldType == 'email') {
-    //         $isValid = $this->validate([
-    //             'login_id' => [
-    //                 'rules' => 'required|valid_email|is_not_unique[users.email]',
-    //                 'errors' => [
-    //                     'required' => 'Email is required.',
-    //                     'valid_email' => 'Please, check the email field. It does not appear to be valid.',
-    //                     'is_not_unique' => 'Email does not exist in our system.'
-    //                 ]
-    //             ],
-    //             'password' => [
-    //                 'rules' => 'required|min_length[5]|max_length[45]',
-    //                 'errors' => [
-    //                     'required' => 'Password is required.',
-    //                     'min_length' => 'Password must have at least 5 characters in length.',
-    //                     'max_length' => 'Password must no have more than 45 characters in length.'
-    //                 ]
-    //             ]
-    //         ]);
-    //     } else {
-    //         $isValid = $this->validate([
-    //             'login_id' => [
-    //                 'rules' => 'required|is_not_unique[users.username]',
-    //                 'errors' => [
-    //                     'required' => 'Username is required.',
-    //                     'is_not_unique' => 'Username does not exist in our system.'
-    //                 ]
-    //             ],
-    //             'password' => [
-    //                 'rules' => 'required|min_length[5]|max_length[45]',
-    //                 'errors' => [
-    //                     'required' => 'Password is required.',
-    //                     'min_length' => 'Password must have at least 5 characters in length.',
-    //                     'max_length' => 'Password must no have more than 45 characters in length.'
-    //                 ]
-    //             ]
-    //         ]);
-    //     }
+        if ($fieldType == 'email') {
+            $isValid = $this->validate([
+                'login_id' => [
+                    'rules' => 'trim|required|valid_email|is_not_unique[users.email]',
+                    'errors' => [
+                        'required' => 'El correo electrónico es obligatorio.',
+                        'valid_email' => 'El correo electrónico no es válido.',
+                        'is_not_unique' => 'El correo electrónico no se encuentra en el sistema.'
+                    ]
+                ],
+                'password' => [
+                    'rules' => 'required|min_length[5]|max_length[45]',
+                    'errors' => [
+                        'required' => 'La contraseña es obligatoria.',
+                        'min_length' => 'La contraseña debe contener al menos 5 caracteres de longitud.',
+                        'max_length' => 'La contraseña no debe exceder 45 caracteres de longitud.'
+                    ]
+                ]
+            ]);
+        } else {
+            $isValid = $this->validate([
+                'login_id' => [
+                    'rules' => 'trim|required|is_not_unique[users.username]',
+                    'errors' => [
+                        'required' => 'El usuario es obligatorio.',
+                        'is_not_unique' => 'El usuario no se encuentra en el sistema.'
+                    ]
+                ],
+                'password' => [
+                    'rules' => 'required|min_length[5]|max_length[45]',
+                    'errors' => [
+                        'required' => 'La contraseña es obligatoria.',
+                        'min_length' => 'La contraseña debe contener al menos 5 caracteres de longitud.',
+                        'max_length' => 'La contraseña no debe exceder 45 caracteres de longitud.'
+                    ]
+                ]
+            ]);
+        }
 
-    //     if (!$isValid) {
-    //         return view('backend/pages/auth/login', [
-    //             'pageTitle' => 'Login',
-    //             'validation' => $this->validator
-    //         ]);
-    //     } else {
-    //         $user = new User();
-    //         $userInfo = $user->where($fieldType, $this->request->getVar('login_id'))->first();
-    //         $check_password = Hash::check($this->request->getVar('password'), $userInfo['password']);
+        if (!$isValid) {
+            return view('backend/pages/auth/login', [
+                'pageTitle' => 'Votación Virtual',
+                'validation' => $this->validator
+            ]);
+        } else {
+            $user = new User();
+            $userInfo = $user->where($fieldType, $this->request->getVar('login_id'))->first();
+            $check_password = Hash::check($this->request->getVar('password'), $userInfo['password']);
 
-    //         if (!$check_password) {
-    //             return redirect()->route('admin.login.form')->with('fail','Wrong password.')->withInput();
-    //         } else {
-    //             CIAuth::setCIAuth($userInfo);   // important line
-    //             return redirect()->route('admin.home');
-    //         }
-    //     }
-    // }
+            if (!$check_password) {
+                return redirect()->route('admin.login.form')->with('fail','Contraseña incorrecta.')->withInput();
+            } else {
+                CIAuth::setCIAuth($userInfo);   // important line
+                return redirect()->route('admin.home');
+            }
+        }
+    }
 
 }

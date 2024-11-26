@@ -10,7 +10,7 @@
             <nav aria-label="breadcrumb" role="navigation">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="<?= route_to('user.home') ?>">Inicio</a>
+                        <a href="<?= (!empty(get_voter())) ? route_to('user.home') : route_to('admin.home') ?>">Inicio</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
                         Ajustes

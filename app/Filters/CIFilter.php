@@ -30,12 +30,28 @@ class CIFilter implements FilterInterface
         if ($arguments[0] == 'guestVoter') {
             if ( CIAuth::checkVoter() ) {
                 return redirect()->route('user.home');
+            } elseif ( CIAuth::check() ) {
+                return redirect()->route('admin.home');
+            }
+        }
+
+        if ($arguments[0] == 'guestAdmin') {
+            if ( CIAuth::check() ) {
+                return redirect()->route('admin.home');
+            } elseif ( CIAuth::checkVoter() ) {
+                return redirect()->route('user.home');
             }
         }
 
         if ($arguments[0] == 'authVoter') {
             if ( !CIAuth::checkVoter() ) {
                 return redirect()->route('user.login.form')->with('fail', 'Debes identificarte primero!');
+            }
+        }
+
+        if ($arguments[0] == 'authAdmin') {
+            if ( !CIAuth::check() ) {
+                return redirect()->route('admin.login.form')->with('fail', 'Debes iniciar sesión primero!');
             }
         }
     }

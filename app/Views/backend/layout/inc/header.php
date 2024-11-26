@@ -32,10 +32,18 @@
                     <?php endif; ?>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                    <?php if (!empty(get_voter())) : ?>
                     <a class="dropdown-item" href="<?= route_to('user.profile'); ?>">
+                    <?php else : ?>
+                    <a class="dropdown-item" href="<?= route_to('admin.profile'); ?>">
+                    <?php endif; ?>
                         <i class="dw dw-user1"></i> Perfil
                     </a>
+                    <?php if (!empty(get_voter())) : ?>
                     <a class="dropdown-item" href="<?= route_to('user.logout') ?>">
+                    <?php else : ?>
+                    <a class="dropdown-item" href="<?= route_to('admin.logout') ?>">
+                    <?php endif; ?>
                         <i class="dw dw-logout"></i> Salir
                     </a>
                 </div>

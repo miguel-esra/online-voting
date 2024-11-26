@@ -27,15 +27,15 @@ class AdminController extends BaseController
     public function index()
     {
         $data = [
-            'pageTitle' => 'Dashboard',
+            'pageTitle' => 'Votación Virtual',
         ];
-        return view('backend/pages/home', $data);
+        return view('backend/pages/home-admin', $data);
     }
 
     public function logoutHandler()
     {
         CIAuth::forget();
-        return redirect()->route('admin.login.form')->with('fail', 'You are logged out!');
+        return redirect()->route('admin.login.form')->with('fail', 'Sesión finalizada.');
     }
 
     public function profile()
@@ -202,7 +202,7 @@ class AdminController extends BaseController
     public function settings()
     {
         $data = [
-            'pageTitle' => 'Settings'
+            'pageTitle' => 'Votación Virtual'
         ];
         return view('backend/pages/settings', $data);
     }

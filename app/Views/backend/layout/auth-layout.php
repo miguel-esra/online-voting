@@ -35,7 +35,11 @@
 		<div class="login-header box-shadow">
 			<div class="container-fluid d-flex justify-content-between align-items-center">
 				<div class="brand-logo">
+					<?php if ( ('/' . uri_string()) == route_to('admin.login.form') ) : ?>
+					<a href="<?= route_to('admin.login.form') ?>">
+					<?php else : ?>
 					<a href="<?= route_to('user.login.form') ?>">
+					<?php endif; ?>
 						<img src="/images/blog/<?= get_settings()->blog_logo ?>" alt="" />
 					</a>
 				</div>
