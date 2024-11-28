@@ -8,6 +8,8 @@ use App\Libraries\CIAuth;
 use App\Models\User;
 use Config\Services;
 USE App\Libraries\Hash;
+use App\Models\Candidate;
+use App\Models\Results;
 use App\Models\Setting;
 use App\Models\SocialMedia;
 use SSP;
@@ -41,7 +43,7 @@ class AdminController extends BaseController
     public function profile()
     {
         $data = array(
-            'pageTitle' => 'Profile'
+            'pageTitle' => 'Votación Virtual'
         );
         return view('backend/pages/profile', $data);
     }
@@ -57,15 +59,15 @@ class AdminController extends BaseController
                 'name' => [
                     'rules' => 'required',
                     'errors' => [
-                        'required' => 'Full name is required.'
+                        'required' => 'El nombre es obligatorio.'
                     ]
                 ],
                 'username' => [
                     'rules' => 'required|min_length[4]|is_unique[users.username,id,' . $user_id . ']',
                     'errors' => [
-                        'required' => 'Username is required.',
-                        'min_length' => 'Username must have a minimum of 4 characters.',
-                        'is_unique' => 'Username is already taken!'
+                        'required' => 'El usuario es obligatorio.',
+                        'min_length' => 'El usuario debe contener al menos 4 caracteres de longitud.',
+                        'is_unique' => 'El usuario ya existe.'
                     ]
                 ]
             ]);
@@ -75,17 +77,17 @@ class AdminController extends BaseController
                 return json_encode(['status' => 0, 'error' => $errors]);
             } else {
                 $user = new User();
-                $update = $user->where('id', $user_id)->set([
-                                    'name' => $request->getVar('name'),
-                                    'username' => $request->getVar('username'),
-                                    'bio' => $request->getVar('bio'),
+                $update = $user->where( 'id', $user_id)->set([
+                                        'name' => $request->getVar('name'),
+                                        'username' => $request->getVar('username'),
+                                        'bio' => $request->getVar('bio'),
                                 ])->update();
 
-                if ( $update) {
+                if ( $update ) {
                     $user_info = $user->find($user_id);
-                    return json_encode(['status' => 1, 'user_info' => $user_info, 'msg' => 'Your personal details have been successfully updated.']);
+                    return json_encode(['status' => 1, 'user_info' => $user_info, 'msg' => 'Tus datos personales han sido actualizados.']);
                 } else {
-                    return json_encode(['status' => 0, 'msg' => 'Something went wrong.']);
+                    return json_encode(['status' => 0, 'msg' => 'Algo salió mal. Intente nuevamente.']);
                 }
             }
         }
@@ -105,16 +107,6 @@ class AdminController extends BaseController
         $old_picture = $user_info->picture;
         $new_filename = 'UIMG_' . $user_id . $file->getRandomName();
 
-        // if ( $file->move($path, $new_filename) ) {
-        //     if ( $old_picture != null && file_exists($path . $old_picture)) {
-        //         unlink($path . $old_picture);
-        //     }
-        //     $user->where('id', $user_info->id)->set(['picture' => $new_filename])->update();
-        //     echo json_encode(['status' => 1, 'msg' => 'Done! Your profile picture has been successfully updated.']);
-        // } else {
-        //     echo json_encode(['status' => 0, 'msg' => 'Something went wrong.']);
-        // }
-
         // Image manipulation
         $upload_image = \Config\Services::image()->withFile($file)->resize(450,450,true,'height')->save($path . $new_filename);
 
@@ -123,11 +115,10 @@ class AdminController extends BaseController
                 unlink($path . $old_picture);
             }
             $user->where('id', $user_info->id)->set(['picture' => $new_filename])->update();
-            echo json_encode(['status' => 1, 'msg' => 'Done! Your profile picture has been successfully updated.']);
+            echo json_encode(['status' => 1, 'msg' => 'Tu foto de perfil ha sido actualizada.']);
         } else {
-            echo json_encode(['status' => 0, 'msg' => 'Something went wrong.']);
+            echo json_encode(['status' => 0, 'msg' => 'Algo salió mal. Intente nuevamente.']);
         }
-
     }
 
     public function changePassword()
@@ -145,25 +136,25 @@ class AdminController extends BaseController
                 'current_password' => [
                     'rules' => 'required|min_length[5]|check_current_password[current_password]',
                     'errors' => [
-                        'required' => 'Enter current password.',
-                        'min_length' => 'The password must have at least 5 characters.',
-                        'check_current_password' => 'The current password is incorrect.'
+                        'required' => 'La contraseña actual es obligatoria.',
+                        'min_length' => 'La contraseña actual debe contener al menos 5 caracteres de longitud.',
+                        'check_current_password' => 'La contraseña actual es incorrecta.'
                     ]
                 ],
                 'new_password' => [
-                    'rules' => 'required|min_length[5]|max_length[20]|is_password_strong[new_password]',
+                    'rules' => 'required|min_length[5]|max_length[45]|is_password_strong[new_password]',
                     'errors' => [
-                        'required' => 'New password is required.',
-                        'min_length' => 'New password must have at least 5 characters.',
-                        'max_length' => 'New password must not exceed more than 20 characters.',
-                        'is_password_strong' => 'The password must contain at least 1 uppercase, 1 lowercase, 1 number and 1 special character.'
+                        'required' => 'La nueva contraseña es obligatoria.',
+                        'min_length' => 'La nueva contraseña debe contener al menos 5 caracteres de longitud.',
+                        'max_length' => 'La nueva contraseña no debe exceder 45 caracteres de longitud.',
+                        'is_password_strong' => 'La nueva contraseña debe contener al menos 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial.'
                     ]
                 ],
                 'confirm_new_password' => [
                     'rules' => 'required|matches[new_password]',
                     'errors' => [
-                        'required' => 'Confirm new password.',
-                        'matches' => 'Password does not match.'
+                        'required' => 'Confirme la nueva contraseña.',
+                        'matches' => 'Las contraseñas no coinciden.'
                     ]
                 ]
             ]);
@@ -194,7 +185,7 @@ class AdminController extends BaseController
                 );
 
                 sendEmail($mailConfig);
-                return $this->response->setJSON(['status' => 1, 'token' => csrf_hash(), 'msg' => 'Done! Your password has been successfully updated.']);
+                return $this->response->setJSON(['status' => 1, 'token' => csrf_hash(), 'msg' => 'Tu contraseña ha sido actualizada.']);
             }
         }
     }
@@ -439,6 +430,39 @@ class AdminController extends BaseController
         return json_encode(
             SSP::simple($_GET, $dbDetails, $table, $primaryKey, $columns)
         );
+    }
+
+    public function getVotingResults()
+    {
+        $request = \Config\Services::request();
+
+        if ( $request->isAJAX() ) {
+            $candidates = new Candidate();
+            $candidatesArray = $candidates->getCandidatesData();
+            $results = new Results();
+            $resultsArray = $results->getResultsData();
+            
+            $votingResults = $candidatesArray;
+
+            foreach ($candidatesArray as $key => $rowCandidates) {
+                foreach ($resultsArray as $rowResults) {
+                    if ($rowCandidates->candidate_number == $rowResults->candidate_number) {
+                        $votingResults[$key] = array(
+                            'name' => $rowCandidates->name,
+                            'candidate_number' => $rowResults->candidate_number,
+                            'total' => $rowResults->total
+                        );
+                        continue 2;
+                    }
+                }
+            }
+
+            // Sort an array by column value
+            $total = array_column($votingResults, 'total');
+            array_multisort($total, SORT_DESC, $votingResults);
+
+            return $this->response->setJSON($votingResults);
+        }
     }
 
 }

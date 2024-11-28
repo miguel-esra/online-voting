@@ -10,7 +10,7 @@
             <nav aria-label="breadcrumb" role="navigation">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="<?= route_to('user.home'); ?>">Inicio</a>
+                        <a href="<?= (!empty(get_voter())) ? route_to('user.home') : route_to('admin.home') ?>">Inicio</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
                         Perfil
@@ -84,10 +84,11 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="">DNI</label>
                                                 <?php if (!empty(get_voter())) : ?>    
+                                                <label for="">DNI</label>
                                                     <input type="text" name="username" class="form-control" placeholder="Enter username" value="<?= get_voter()->user_id ?>" readonly>
                                                 <?php else : ?>
+                                                <label for="">Usuario</label>
                                                     <input type="text" name="username" class="form-control" placeholder="Enter username" value="<?= get_user()->username ?>" readonly>
                                                 <?php endif; ?>
                                                 <span class="text-danger error-text username_error"></span>
@@ -143,8 +144,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group" style="display: none;">
-                                        <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary" style="display: none;">Cambiar contraseña</button>
                                     </div>
                                 </form>
                             </div>

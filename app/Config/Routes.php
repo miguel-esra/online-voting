@@ -23,6 +23,11 @@ $routes->group('', static function($routes) {
         $routes->get('votacion-virtual/administrador/inicio', 'AdminController::index', ['as' => 'admin.home']);
         $routes->get('votacion-virtual/administrador/salir', 'AdminController::logoutHandler', ['as' => 'admin.logout']);
         $routes->get('votacion-virtual/administrador/ajustes', 'AdminController::settings', ['as' => 'admin.settings']);
+        $routes->get('votacion-virtual/administrador/perfil', 'AdminController::profile', ['as' => 'admin.profile']);
+        $routes->post('votacion-virtual/administrador/actualizar-datos-personales', 'AdminController::updatePersonalDetails', ['as' => 'update-personal-details']);
+        $routes->post('votacion-virtual/administrador/actualizar-foto-perfil', 'AdminController::updateProfilePicture', ['as' => 'update-profile-picture']);
+        $routes->post('votacion-virtual/administrador/cambiar-clave', 'AdminController::changePassword', ['as' => 'change-password']);
+        $routes->get('votacion-virtual/administrador/obtener-resultados', 'AdminController::getVotingResults', ['as' => 'get-results']);
     });
 
     $routes->group('', ['filter' => 'cifilter:guestVoter'], static function($routes) {
