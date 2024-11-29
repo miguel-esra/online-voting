@@ -21,8 +21,17 @@
     </div>
 </div>
 
-<div class="bg-white pd-20 card-box mb-30">
-    <div id="chart_1" style="height: 560px;"></div>
+<div class="row">
+    <div class="col-lg-6 col-md-6 mb-20">
+        <div class="card-box height-100-p pd-20">
+            <div id="chart_bar_1" style="height: 560px;"></div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 mb-20">
+        <div class="card-box height-100-p pd-20">
+            <div id="chart_pie_1" style="height: 560px;"></div>
+        </div>
+    </div>
 </div>
 
 <?= $this->endSection() ?>
@@ -34,7 +43,7 @@
 <script src="/extra-assets/highcharts-6.0.7/highcharts-more.js"></script>
 
 <script>
-function showChart() {
+function showCharts() {
     $(document).ready(function() {
         var receivedData; // store your value here
         var url = "<?= route_to('get-results') ?>";
@@ -51,24 +60,25 @@ function showChart() {
             });
         };
 
-        functionGetData().done(createChart);
+        functionGetData().done(createChartBar);
+        functionGetData().done(createChartPie);
     });
 }
 
-function createChart(data) {
+function createChartBar(data) {
     var options = {
         chart: {
             type: 'column'
         },
         title: {
-            text: 'Elecciones Municipales 2024',
+            text: 'Resultados Elecciones Municipales 2024',
             margin : 30,
             style: {
                 fontSize: '26px'
             },
         },
         subtitle: {
-            text: 'Resultados Votos Emitidos',
+            text: 'Número de Votos Obtenidos',
             style: {
                 fontSize: '18px',
             }
@@ -123,11 +133,90 @@ function createChart(data) {
 
     $(document).ready(function() {
         var chart;
-        chart = new Highcharts.chart('chart_1', options);
+        chart = new Highcharts.chart('chart_bar_1', options);
     });
 }
 
-showChart();
+function createChartPie(data) {
+    var options = {
+        title: {
+            text: 'Resultados Elecciones Municipales 2024',
+            margin : 30,
+            style: {
+                fontSize: '26px'
+            },
+        },
+        subtitle: {
+            text: 'Porcentaje de Votos Obtenidos (%)',
+            style: {
+                fontSize: '18px',
+            }
+        },
+        xAxis: {
+            categories: ['']
+        },
+        tooltip: {
+            headerFormat:   '<span style="color:{point.color}; font-size:14px; font-weight: 600; padding:0.5em 1em 0.5em 1em;">{point.key}</span><table>',
+            pointFormat:    '<tr><td style="padding:0.5em 1em 0.5em 1em; font-size:14px; font-weight: 600;">Porcentaje: </td>' +
+                            '<td style="padding:0em 1em 0em 1em; text-align:right;"><b>{point.percentage:.3f} %</b></td></tr>',
+            footerFormat:   '</table>',
+            shared: false,
+            useHTML: true
+        },
+        chart: {
+            events: {
+                load: function() {
+                    this.series[0].points.forEach(point => {
+                        point.update({
+                            dataLabels: {
+                                style: {
+                                    width: `50px`
+                                }
+                            }
+                        })
+                    })
+                }
+            }
+        },
+        series: [
+
+        ],
+        credits: {
+            enabled: false
+        }
+    };
+
+    var colors = ['#9DBDFF', '#FF9874', '#29ADB2'];
+    var dataPie = [];
+
+    for (var i = 0; i <= data.length-1; i++)
+    {
+        var item = data[i];
+        dataPie.push({
+            "name": item.name,
+            "y": parseInt(item.total),
+            "selected": i == 0 ? true : false,
+            "sliced": i == 0 ? true : false,
+            "color" : colors[i]
+        });
+    }
+
+    options.series.push({
+        "type": 'pie',
+        "allowPointSelect": true,
+        "keys": ['name', 'y', 'selected', 'sliced'],
+        "data": dataPie,
+        "showInLegend": true
+    });
+
+    $(document).ready(function() {
+        var chart;
+        var w = $('#chart_pie_1').closest("row").width();
+        chart = new Highcharts.chart('chart_pie_1', options);
+    });
+}
+
+showCharts();
 
 </script>
 
