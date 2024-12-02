@@ -26,6 +26,10 @@ class CreateVotersTable extends Migration
                 'type' => 'INT',
                 'constraint' => 1
             ],
+            'status' => [
+                'type' => 'INT',
+                'constraint' => 1
+            ],
             'created_at timestamp default current_timestamp',
             'updated_at timestamp default current_timestamp on update current_timestamp'
         ]);

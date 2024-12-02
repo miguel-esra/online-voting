@@ -28,6 +28,8 @@ $routes->group('', static function($routes) {
         $routes->post('votacion-virtual/administrador/actualizar-foto-perfil', 'AdminController::updateProfilePicture', ['as' => 'update-profile-picture']);
         $routes->post('votacion-virtual/administrador/cambiar-clave', 'AdminController::changePassword', ['as' => 'change-password']);
         $routes->get('votacion-virtual/administrador/obtener-resultados', 'AdminController::getVotingResults', ['as' => 'get-results']);
+        $routes->get('votacion-virtual/administrador/participantes', 'AdminController::participants', ['as' => 'admin.participants']);
+        $routes->get('votacion-virtual/administrador/obtener-participantes', 'AdminController::getParticipants', ['as' => 'get-participants']);
     });
 
     $routes->group('', ['filter' => 'cifilter:guestVoter'], static function($routes) {

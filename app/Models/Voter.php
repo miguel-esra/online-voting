@@ -8,6 +8,6 @@ class Voter extends Model
 {
     protected $table            = 'voters';
     protected $primaryKey       = 'id';
-    protected $allowedFields    = ['name', 'user_id', 'check_digit'];
+    protected $allowedFields    = ['name', 'user_id', 'check_digit', 'status'];
 
 }

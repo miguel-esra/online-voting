@@ -465,4 +465,67 @@ class AdminController extends BaseController
         }
     }
 
+    public function participants()
+    {
+        $data = [
+            'pageTitle' => 'Votación Virtual'
+        ];
+        return view('backend/pages/participants', $data);
+    }
+
+    public function getParticipants()
+    {
+        //DB details
+        $dbDetails = array(
+            "host" => $this->db->hostname,
+            "user" => $this->db->username,
+            "pass" => $this->db->password,
+            "db"   => $this->db->database
+        );
+
+        $table = "voters";
+        $primaryKey = "id";
+        $columns = array(
+            array(
+                "db" => "id",
+                "dt" => 0,
+                "formatter" => function ($d, $row) {
+                    $zerofill = sprintf('%06d', $d);
+                    return $zerofill;
+                }
+            ),
+            array(
+                "db" => "name",
+                "dt" => 1
+            ),
+            array(
+                "db" => "user_id",
+                "dt" => 2,
+                "formatter" => function ($d, $row) {
+                    $user_id_hidden = substr_replace($d, "***", 5, 3);
+                    return $user_id_hidden;
+                }
+            ),
+            array(
+                "db" => "status",
+                "dt" => 3,
+                "formatter" => function ($d, $row) {
+                    if ($d == 1) {
+                        return "<div class='btn-group'>
+                                    <button class='btn btn-sm btn-success p-1' style='min-width: 96px; pointer-events: none;'>Habilitado</button>
+                                </div>";
+                    } else {
+                        return "<div class='btn-group'>
+                                    <button class='btn btn-sm btn-danger p-1' style='min-width: 96px; pointer-events: none;'>Inhabilitado</button>
+                                </div>";
+                    }
+                }
+            )
+        );
+
+        return json_encode(
+            SSP::simple($_GET, $dbDetails, $table, $primaryKey, $columns)
+        );
+    }
+
 }

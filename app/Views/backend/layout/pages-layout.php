@@ -84,6 +84,30 @@
 					stroke-dashoffset: 0;
 				}
 			}
+			@media only screen and (min-width: 768px) {
+				.dataTables_filter {
+					float: left !important;
+				}
+				.dataTables_filter input[type="search"] {
+					width: 500px !important;
+				}
+			}
+			@media only screen and (max-width: 767px) {
+				.text-info-filtered {
+					display: block !important;
+				}
+				.dom-bottom {
+					line-height: 1.5 !important;
+				}
+				.pagination {
+					padding-top: 1em !important;
+					justify-content: center !important;
+				}
+			}
+			.data-table td {
+				padding-top: 0.95em !important;
+				padding-bottom: 0.95em !important;
+			}
 		</style>
     </head>
 	<body>
