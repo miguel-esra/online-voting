@@ -8,10 +8,13 @@ use App\Libraries\CIAuth;
 use App\Libraries\Hash;
 use App\Models\User;
 use App\Models\Voter;
+use App\Models\LoginAttempt;
 use App\Models\PasswordResetToken;
 use Carbon\Carbon;
 use CodeIgniter\Config\Services as ConfigServices;
 use CodeIgniter\Database\Config;
+use CodeIgniter\I18n\Time;
+use CodeIgniter\I18n\TimeDifference;
 use Config\Services;
 
 class AuthController extends BaseController
@@ -31,6 +34,8 @@ class AuthController extends BaseController
 
     public function loginHandlerUser()
     {
+        $login_attempt = new LoginAttempt();
+
         $isValid = $this->validate([
             'login_id' => [
                 'rules' => 'required|min_length[8]|max_length[8]|is_not_unique[voters.user_id]',
@@ -61,13 +66,96 @@ class AuthController extends BaseController
             $userDigit = $userInfo['check_digit'];
             $check_digit = $this->request->getVar('check_digit');
             
-            if ( $check_digit != $userDigit ) {
-                return redirect()->route('user.login.form')->with('fail', 'El dígito verificador es incorrecto.')->withInput();
+            if ( $this->isBlocked()) {
+                return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
             } else {
-                CIAuth::setCIAuthVoter($userInfo);   // important line
-                return redirect()->route('user.home');
+                if ( $check_digit != $userDigit ) {
+                    $this->loginAttempt();
+                    $record = $login_attempt->where('user_id', $this->request->getVar('login_id'))->first();
+                    if ($record['attempts'] == 3) {
+                        return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
+                    } elseif ($record['attempts'] == 2) {
+                        return redirect()->route('user.login.form')->with('fail', 'El dígito verificador es incorrecto. Queda ' . (3 - $record['attempts']) . ' intento.')->withInput();
+                    } else {
+                        return redirect()->route('user.login.form')->with('fail', 'El dígito verificador es incorrecto. Quedan ' . (3 - $record['attempts']) . ' intentos.')->withInput();
+                    }
+                } else {
+                    CIAuth::setCIAuthVoter($userInfo);   // important line
+                    $this->loginAttempt( true );
+                    return redirect()->route('user.home');
+                }
             }
-        }
+        } 
+    }
+
+    private function loginAttempt( $passed = false )
+    {
+        $login_attempt = new LoginAttempt();
+        $user_id = $this->request->getVar('login_id');
+
+        // If the user logged in with success
+        if ( $passed ) :
+            // Clear this user loginAttempts
+            $login_attempt->where('user_id', $user_id)->set(['attempts' => 0, 'timestamp' => Time::now('America/Lima')])->update();
+ 
+        // This is a failed login attempt
+        else :
+            // Check if we have the user record
+            $record = $login_attempt->where('user_id', $user_id)->first();
+
+            if ( empty( $record ) ) :
+                // Create the user record
+                $data = [
+                    'user_id' => $user_id,
+                    'attempts' => 1,
+                    'timestamp' => Time::now('America/Lima')
+                ];
+                $login_attempt->save($data);
+
+            // Check if the user needs to be blocked
+            else :
+                // The user exceeded the login attempts
+                if ( $record['attempts'] < 3 ):
+                    // Update the user record
+                    $login_attempt->where('user_id', $user_id)->set(['attempts' => ($record['attempts'] + 1), 'timestamp' => Time::now('America/Lima')])->update();
+                endif;
+            endif;
+        endif;
+ 
+        return true;
+    }
+
+    public function isBlocked()
+    {
+        $login_attempt = new LoginAttempt();
+        $user_id = $this->request->getVar('login_id');
+
+        // Time that a user gets blocked
+        $blockTime = 1800;
+ 
+        // Check if we have the user record
+        $record = $login_attempt->where('user_id', $user_id)->first();
+        if ( !empty( $record ) ) :
+            // Check this user login attempts
+            if ( $record['attempts'] >= 3 ) :
+                // Check if the user block time has expired
+                $record_timestamp = Time::parse($record['timestamp'], 'America/Lima');
+                $current_timestamp = Time::now('America/Lima');
+                $diff = $record_timestamp->difference($current_timestamp);
+                
+                if ( $diff->getSeconds() > $blockTime ) :
+                    // User is not blocked anymore and clear login attempts
+                    $login_attempt->where('user_id', $user_id)->set(['attempts' => 0, 'timestamp' => Time::now('America/Lima')])->update();
+                    return false;
+                else:
+                    // The user is blocked
+                    return true;
+                endif;
+            endif;
+        endif;
+ 
+        // The user is not blocked
+        return false;
     }
 
     public function loginForm()

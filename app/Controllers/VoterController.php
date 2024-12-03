@@ -78,16 +78,23 @@ class VoterController extends BaseController
 
         $result = new Results();
         $voter = CIAuth::voter();
+        
         $data = [
             'user_id' => $voter->user_id,
             'candidate_number' => $request->getVar('candidate_number')
         ];
-        $save = $result->save($data);
 
-        if ( $save ) {
-            return $this->response->setJSON(['status' => 1, 'msg' => 'Voto registrado correctamente.']);
+        // Validate one vote per participant
+        if ( $this->validateData($data, ['user_id' => 'required|is_not_unique[results.user_id]']) ) {
+            return $this->response->setJSON(['status' => 0, 'msg' => 'Solo es posible emitir un voto por participante.']);
         } else {
-            return $this->response->setJSON(['status' => 0, 'msg' => 'Algo salió mal. Intente nuevamente.']);
+            $save = $result->save($data);
+
+            if ( $save ) {
+                return $this->response->setJSON(['status' => 1, 'msg' => 'Voto registrado correctamente.']);
+            } else {
+                return $this->response->setJSON(['status' => 0, 'msg' => 'Algo salió mal. Intente nuevamente.']);
+            }
         }
     }
 }
