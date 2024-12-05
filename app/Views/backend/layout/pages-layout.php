@@ -103,10 +103,19 @@
 					padding-top: 1em !important;
 					justify-content: center !important;
 				}
+				#td-width-results {
+					width: 80% !important;
+				}
 			}
 			.data-table td {
 				padding-top: 0.95em !important;
 				padding-bottom: 0.95em !important;
+			}
+			.table-results, .table-results th .table-results tr, .table-results td {
+				border: none !important;
+				padding: 0.5em 1em 0.5em 1em !important;
+				margin: 0em !important;
+				background: none !important;
 			}
 		</style>
     </head>

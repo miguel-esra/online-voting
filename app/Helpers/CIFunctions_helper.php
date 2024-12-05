@@ -123,3 +123,59 @@ if ( !function_exists('get_voter_choice_details') ) {
         }
     }
 }
+
+if ( !function_exists('count_voters') ) {
+    function count_voters() {
+        $voters = new Voter();
+        $voters_data = $voters->asObject()->findAll();
+
+        if ( !$voters_data ) {
+            return null;
+        } else {
+            return count($voters_data);
+        }
+    }
+}
+
+if ( !function_exists('count_votes') ) {
+    function count_votes() {
+        $results = new Results();
+        $results_data = $results->asObject()->findAll();
+
+        if ( !$results_data ) {
+            return null;
+        } else {
+            return count($results_data);
+        }
+    }
+}
+
+if ( !function_exists('get_votes_blank') ) {
+    function get_votes_blank() {
+        $results = new Results();
+        $results_data = $results->asObject()->where('candidate_number', 3)->findAll();
+
+        if ( !$results_data ) {
+            return null;
+        } else {
+            return count($results_data);
+        }
+    }
+}
+
+if ( !function_exists('get_votes_candidates') ) {
+    function get_votes_candidates() {
+        $builder = new Results();
+        $candidates = [1, 2];
+        $results_data = $builder->select('name, candidate_number, COUNT(candidate_number) votes')
+                        ->join('candidates', 'candidate_number', 'left')
+                        ->whereIn('candidate_number', $candidates)
+                        ->groupBy('candidate_number')->orderBy('votes', 'DESC');
+
+        if ( !$results_data ) {
+            return null;
+        } else {
+            return $results_data->get()->getResult();
+        }
+    }
+}

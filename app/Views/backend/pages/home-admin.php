@@ -1,3 +1,7 @@
+<?php
+
+use CodeIgniter\I18n\Time;
+?>
 <?= $this->extend('backend/layout/pages-layout') ?>
 <?= $this->section('content') ?>
 
@@ -18,6 +22,117 @@
                 </ol>
             </nav>
         </div>
+    </div>
+</div>
+
+<div class="row clearfix">
+    <div class="col-md-12 col-sm-12 mb-20">
+        <div class="card text-white bg-info card-box">
+            <div class="card-body">
+                <table class="table table-bordered table-results">
+                    <tbody>
+                        <tr>
+                            <td scope="col" width="" rowspan="4" style="text-align: right; vertical-align: middle;">
+                                <h1 class="text-white"><i class="icon-copy dw dw-edit-1"></i></h1>
+                            </td>
+                            <td scope="col" width="65%" id="td-width-results"><h6 class="text-white">ELECTORES HÁBILES: <?= number_format(count_voters(), 0, '', ',') ?></h6></td>
+                        </tr>
+                        <tr>
+                            <td><h6 class="text-white">TOTAL DE VOTOS EMITIDOS: <?= number_format(count_votes(), 0, '', ',') ?></h6></td>
+                        </tr>
+                        <tr>
+                            <td><h6 class="text-white">ACTUALIZADO EL <?= Time::now('America/Lima')->format('d/m/Y') ?> A LAS <?= Time::now('America/Lima')->format('H:i') ?></h6></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="pd-20 card-box mb-30">
+    <div class="clearfix mb-20">
+        <div class="pull-left">
+            <h4 class="text-blue h4">Total de Votos</h4>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table text-center">
+            <tbody>
+                <tr>
+                    <th scope="col">LISTAS INSCRITAS</th>
+                    <th scope="col">TOTAL</th>
+                    <th scope="col">% VÁLIDOS</th>
+                    <th scope="col">% EMITIDOS</th>
+                </tr>
+                <tr>
+                    <td scope="row"><?= get_votes_candidates()[0]->name ?></td>
+                    <td><?= number_format(get_votes_candidates()[0]->votes, 0, '', ',') ?></td>
+                    <td><?= number_format(get_votes_candidates()[0]->votes / (get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) * 100, 3, '.', '') ?> %</td>
+                    <td><?= number_format(get_votes_candidates()[0]->votes / count_votes() * 100, 3, '.', '') ?> %</td>
+                </tr>
+                <tr>
+                    <td scope="row"><?= get_votes_candidates()[1]->name ?></td>
+                    <td><?= number_format(get_votes_candidates()[1]->votes, 0, '', ',') ?></td>
+                    <td><?= number_format(get_votes_candidates()[1]->votes / (get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) * 100, 3, '.', '') ?> %</td>
+                    <td><?= number_format(get_votes_candidates()[1]->votes / count_votes() * 100, 3, '.', '') ?> %</td>
+                </tr>
+                <tr>
+                    <td scope="row">TOTAL DE VOTOS VÁLIDOS</td>
+                    <td><?= number_format(get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes, 0, '', ',') ?></td>
+                    <td><?= number_format((get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) / (get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) * 100, 3, '.', '') ?> %</td>
+                    <td><?= number_format((get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) / count_votes() * 100, 3, '.', '') ?> %</td>
+                </tr>
+                <tr>
+                    <td scope="row">VOTOS EN BLANCO</td>
+                    <td><?= number_format(get_votes_blank(), 0, '', ',') ?></td>
+                    <td></td>
+                    <td><?= number_format(get_votes_blank() / count_votes() * 100, 3, '.', '') ?> %</td>
+                </tr>
+                <tr>
+                    <td scope="row">TOTAL DE VOTOS EMITIDOS</td>
+                    <td><?= number_format(count_votes(), 0, '', ',') ?></td>
+                    <td></td>
+                    <td><?= number_format((get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes + get_votes_blank()) / count_votes() * 100, 3, '.', '') ?> %</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="pd-20 card-box mb-30">
+    <div class="clearfix mb-20">
+        <div class="pull-left">
+            <h4 class="text-blue h4">Participación</h4>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table text-center">
+            <tbody>
+                <tr>
+                    <th scope="col" colspan="4">ELECTORES HÁBILES</th>
+                </tr>
+                <tr>
+                    <td scope="row" colspan="4"><?= number_format(count_voters(), 0, '', ',') ?></td>
+                </tr>
+                <tr>
+                    <th scope="col" colspan="2">PARTICIPACIÓN</th>
+                    <th scope="col" colspan="2">AUSENTISMO</th>
+                </tr>
+                <tr>
+                    <td scope="row">TOTAL ASISTENTES</td>
+                    <td>% TOTAL ASISTENTES</td>
+                    <td>TOTAL AUSENTES</td>
+                    <td>% TOTAL AUSENTES</td>
+                </tr>
+                <tr>
+                    <td scope="row"><?= number_format(count_votes(), 0, '', ',') ?></td>
+                    <td><?= number_format(count_votes() / count_voters() * 100, 3, '.', '') ?> %</td>
+                    <td><?= number_format(count_voters() - count_votes(), 0, '', ',') ?></td>
+                    <td><?= number_format((count_voters() - count_votes()) / count_voters() * 100, 3, '.', '') ?> %</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 

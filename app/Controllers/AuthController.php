@@ -35,6 +35,7 @@ class AuthController extends BaseController
     public function loginHandlerUser()
     {
         $login_attempt = new LoginAttempt();
+        $voter = new Voter();
 
         $isValid = $this->validate([
             'login_id' => [
@@ -73,6 +74,7 @@ class AuthController extends BaseController
                     $this->loginAttempt();
                     $record = $login_attempt->where('user_id', $this->request->getVar('login_id'))->first();
                     if ($record['attempts'] == 3) {
+                        $voter->where('user_id', $this->request->getVar('login_id'))->set(['status' => 0])->update();
                         return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
                     } elseif ($record['attempts'] == 2) {
                         return redirect()->route('user.login.form')->with('fail', 'El dígito verificador es incorrecto. Queda ' . (3 - $record['attempts']) . ' intento.')->withInput();
@@ -91,12 +93,14 @@ class AuthController extends BaseController
     private function loginAttempt( $passed = false )
     {
         $login_attempt = new LoginAttempt();
+        $voter = new Voter();
         $user_id = $this->request->getVar('login_id');
 
         // If the user logged in with success
         if ( $passed ) :
             // Clear this user loginAttempts
             $login_attempt->where('user_id', $user_id)->set(['attempts' => 0, 'timestamp' => Time::now('America/Lima')])->update();
+            $voter->where('user_id', $user_id)->set(['status' => 1])->update();
  
         // This is a failed login attempt
         else :
@@ -128,6 +132,7 @@ class AuthController extends BaseController
     public function isBlocked()
     {
         $login_attempt = new LoginAttempt();
+        $voter = new Voter();
         $user_id = $this->request->getVar('login_id');
 
         // Time that a user gets blocked
@@ -146,8 +151,9 @@ class AuthController extends BaseController
                 if ( $diff->getSeconds() > $blockTime ) :
                     // User is not blocked anymore and clear login attempts
                     $login_attempt->where('user_id', $user_id)->set(['attempts' => 0, 'timestamp' => Time::now('America/Lima')])->update();
+                    $voter->where('user_id', $user_id)->set(['status' => 1])->update();
                     return false;
-                else:
+                else :
                     // The user is blocked
                     return true;
                 endif;

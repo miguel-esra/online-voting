@@ -98,10 +98,10 @@ var participants_DT = $('#DataTables_Table_0').DataTable({
         }
     },
     ajax: "<?= route_to('get-participants') ?>",
-    columnDefs: [
-        { orderable: false, targets: [3] }
-        // { visible: false, targets: 3 }
-    ],
+    // columnDefs: [
+    //     { orderable: false, targets: [3] }
+    //     // { visible: false, targets: 3 }
+    // ],
     order: [[0, 'desc']]
 });
 
