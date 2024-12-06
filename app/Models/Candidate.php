@@ -12,8 +12,9 @@ class Candidate extends Model
 
     public function getCandidatesData() 
     {
+        $candidates = [1, 2];
         $builder = $this->db->table('candidates');
-        $builder->select('name, candidate_number, 0 total')->orderBy('candidate_number', 'ASC');
+        $builder->select('name, candidate_number, 0 total')->whereIn('candidate_number', $candidates)->orderBy('candidate_number', 'ASC');
 
         return $builder->get()->getResult();
     }

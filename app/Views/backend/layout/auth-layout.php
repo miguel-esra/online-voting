@@ -29,6 +29,23 @@
 				-webkit-appearance: none;
 				margin: 0;
 			}
+			.div-login-title {
+				display: flex;
+				justify-content: center;
+			}
+			.h2-login-title {
+				width: 100%;
+			}
+			@media only screen and (min-width: 1024px) {
+				.h2-login-title {
+					width: 60%;
+				}
+			}
+			@media only screen and (max-width: 1024px) {
+				.h2-login-title {
+					padding: 0em 1em 1em 1em;
+				}
+			}
 		</style>
 	</head>
 	<body class="login-page">
@@ -50,7 +67,9 @@
 		</div>
 		<div class="login-wrap d-flex align-items-center flex-wrap justify-content-center">
 			<div class="container">
-				<h2 class="text-center text-primary">Elecciones Municipales 2024</h2>
+				<div class="div-login-title">
+					<h2 class="text-center text-primary h2-login-title">Elecciones de la Junta Directiva del Sindicato de La Libertad 2025-2026</h2>
+				</div>
 				<div class="row align-items-center">
 					<div class="col-md-6 col-lg-7" style="padding-bottom: 1em;">
 						<img src="/backend/vendors/images/login-page-img.png" alt="" />

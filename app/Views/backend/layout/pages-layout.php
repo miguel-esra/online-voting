@@ -43,6 +43,8 @@
 				cursor: pointer;
 				transition: all 0.3s ease-in;
 				border-radius: 40px;
+				width: 280px;
+				height: 330px;
 			}
 			input[type=radio]:checked + .label-radio{
 				border-color: #8FD14F;

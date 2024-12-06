@@ -1,9 +1,7 @@
-<?php
-
-use CodeIgniter\I18n\Time;
-?>
 <?= $this->extend('backend/layout/pages-layout') ?>
 <?= $this->section('content') ?>
+
+<?php use CodeIgniter\I18n\Time; ?>
 
 <div class="page-header">
     <div class="row">
@@ -28,6 +26,7 @@ use CodeIgniter\I18n\Time;
 <div class="row clearfix">
     <div class="col-md-12 col-sm-12 mb-20">
         <div class="card text-white bg-info card-box">
+            <div class="card-header"><h5 class="text-white">Elecciones de la Junta Directiva del Sindicato de La Libertad 2025-2026</h5></div>
             <div class="card-body">
                 <table class="table table-bordered table-results">
                     <tbody>
@@ -66,34 +65,62 @@ use CodeIgniter\I18n\Time;
                     <th scope="col">% EMITIDOS</th>
                 </tr>
                 <tr>
+                    <?php if ( get_votes_candidates()[0]->votes != 0 ) : ?>
                     <td scope="row"><?= get_votes_candidates()[0]->name ?></td>
                     <td><?= number_format(get_votes_candidates()[0]->votes, 0, '', ',') ?></td>
                     <td><?= number_format(get_votes_candidates()[0]->votes / (get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) * 100, 3, '.', '') ?> %</td>
                     <td><?= number_format(get_votes_candidates()[0]->votes / count_votes() * 100, 3, '.', '') ?> %</td>
+                    <?php else : ?>
+                    <td scope="row"><?= get_candidates()[0]->name ?></td>
+                    <td>0</td>
+                    <td><?= number_format(0, 3, '.', '') ?> %</td>
+                    <td><?= number_format(0, 3, '.', '') ?> %</td>
+                    <?php endif; ?>
                 </tr>
                 <tr>
+                    <?php if ( get_votes_candidates()[0]->votes != 0 ) : ?>
                     <td scope="row"><?= get_votes_candidates()[1]->name ?></td>
                     <td><?= number_format(get_votes_candidates()[1]->votes, 0, '', ',') ?></td>
                     <td><?= number_format(get_votes_candidates()[1]->votes / (get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) * 100, 3, '.', '') ?> %</td>
                     <td><?= number_format(get_votes_candidates()[1]->votes / count_votes() * 100, 3, '.', '') ?> %</td>
+                    <?php else : ?>
+                    <td scope="row"><?= get_candidates()[1]->name ?></td>
+                    <td>0</td>
+                    <td><?= number_format(0, 3, '.', '') ?> %</td>
+                    <td><?= number_format(0, 3, '.', '') ?> %</td>
+                    <?php endif; ?>
                 </tr>
                 <tr>
                     <td scope="row">TOTAL DE VOTOS VÁLIDOS</td>
+                    <?php if ( get_votes_candidates()[0]->votes != 0 ) : ?>
                     <td><?= number_format(get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes, 0, '', ',') ?></td>
                     <td><?= number_format((get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) / (get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) * 100, 3, '.', '') ?> %</td>
                     <td><?= number_format((get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes) / count_votes() * 100, 3, '.', '') ?> %</td>
+                    <?php else : ?>
+                    <td>0</td>
+                    <td><?= number_format(0, 3, '.', '') ?> %</td>
+                    <td><?= number_format(0, 3, '.', '') ?> %</td>
+                    <?php endif; ?>
                 </tr>
                 <tr>
                     <td scope="row">VOTOS EN BLANCO</td>
                     <td><?= number_format(get_votes_blank(), 0, '', ',') ?></td>
                     <td></td>
+                    <?php if ( !empty(count_votes()) ) : ?>
                     <td><?= number_format(get_votes_blank() / count_votes() * 100, 3, '.', '') ?> %</td>
+                    <?php else : ?>
+                    <td><?= number_format(0, 3, '.', '') ?> %</td>
+                    <?php endif; ?>
                 </tr>
                 <tr>
                     <td scope="row">TOTAL DE VOTOS EMITIDOS</td>
                     <td><?= number_format(count_votes(), 0, '', ',') ?></td>
                     <td></td>
+                    <?php if ( !empty(count_votes()) ) : ?>
                     <td><?= number_format((get_votes_candidates()[0]->votes + get_votes_candidates()[1]->votes + get_votes_blank()) / count_votes() * 100, 3, '.', '') ?> %</td>
+                    <?php else : ?>
+                    <td><?= number_format(0, 3, '.', '') ?> %</td>
+                    <?php endif; ?>
                 </tr>
             </tbody>
         </table>
@@ -186,17 +213,11 @@ function createChartBar(data) {
             type: 'column'
         },
         title: {
-            text: 'Resultados Elecciones Municipales 2024',
+            text: 'Número de Votos Obtenidos',
             margin : 30,
             style: {
-                fontSize: '26px'
+                fontSize: '22px'
             },
-        },
-        subtitle: {
-            text: 'Número de Votos Obtenidos',
-            style: {
-                fontSize: '18px',
-            }
         },
         xAxis: {
             categories: [''],
@@ -255,17 +276,11 @@ function createChartBar(data) {
 function createChartPie(data) {
     var options = {
         title: {
-            text: 'Resultados Elecciones Municipales 2024',
+            text: 'Porcentaje de Votos Obtenidos (%)',
             margin : 30,
             style: {
-                fontSize: '26px'
+                fontSize: '22px'
             },
-        },
-        subtitle: {
-            text: 'Porcentaje de Votos Obtenidos (%)',
-            style: {
-                fontSize: '18px',
-            }
         },
         xAxis: {
             categories: ['']
@@ -278,6 +293,11 @@ function createChartPie(data) {
             shared: false,
             useHTML: true
         },
+        plotOptions: {
+            pie: {
+                size: 300,
+            }
+        },
         chart: {
             events: {
                 load: function() {
@@ -285,7 +305,7 @@ function createChartPie(data) {
                         point.update({
                             dataLabels: {
                                 style: {
-                                    width: `50px`
+                                    width: `140px`
                                 }
                             }
                         })
@@ -296,6 +316,23 @@ function createChartPie(data) {
         series: [
 
         ],
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 440
+                },
+                chartOptions: {
+                    plotOptions: {
+                        pie: {
+                            size: 180,
+                            dataLabels: {
+                                distance: 15
+                            }
+                        }
+                    }
+                }
+            }]
+		},
         credits: {
             enabled: false
         }

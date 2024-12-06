@@ -28,7 +28,7 @@
             <div class="row align-items-center">
                 <div class="col-md-12">
                     <h4 class="font-20 weight-500 mb-10" style="padding-top: 1em;">
-                        Elecciones Municipales 2024
+                        Elecciones de la Junta Directiva del Sindicato de La Libertad 2025-2026
                         <div class="weight-600 font-24 text-blue">¡Muchas gracias por emitir tu voto!</div>
                     </h4>
                 </div>
@@ -60,11 +60,17 @@
                 <?= get_voter_choice_details()->name ?>
             </h5>
             <p class="text-center text-muted font-14 ci-user-number">
-                <?= 'Candidato ' . get_voter_choice_details()->candidate_number ?>
+                <?= ( get_voter_choice_details()->candidate_number == 3 ) ? 'Voto en blanco' : 'Lista Inscrita' ?>
             </p>
-            <p class="text-center text-muted font-italic font-14 ci-user-bio">
-                <?=  str_replace(".", "<br>", get_voter_choice_details()->bio) ?>
-            </p>
+            <?php if ( get_voter_choice_details()->candidate_number == 3 ) : ?>
+                <div style="display: none;"></div>
+            <?php else : ?>
+            <div style="padding: 1em 1em 1em 1em; display: flex; justify-content: center;">
+                <button class="btn btn-info btn-sm candidate_details_btn" data-candidate="<?= get_voter_choice_details()->candidate_number ?>" style="padding: 0.8em 1em; font-size: 12pt;">
+                    <i class="icon-copy fa fa-eye" aria-hidden="true"></i>&ensp;Ver integrantes
+                </button>
+            </div>
+            <?php endif; ?> 
             <div class="wrap-svg text-center">
                 <svg width="90px" height="90px" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="13.5 13.5 37 37" enable-background="new 0 0 64 64">
                     <g>
@@ -94,10 +100,45 @@
 </div>
 <?php endif; ?>
 
+<?php include('modals/candidate-details-modal-form.php') ?>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
+// disable button if vote is blank
+$(document).ready(function () {
+    var btn_candidate = $('.candidate_details_btn');
+    var candidate_number = btn_candidate.data('candidate');
+
+    if (candidate_number == 3) {
+        btn_candidate.prop( "disabled", true );
+        btn_candidate.css( "pointer-events", "none" );
+    }
+});
+
+$(document).on('click', '.candidate_details_btn', function (e) {
+    e.preventDefault();
+    var modal = $('body').find('div#candidate-details-modal');
+    var candidate = $(this).data("candidate");
+    // for blank vote
+    if (candidate == 3) {
+        return false;
+    }
+    var modal_title = (candidate == 1) ? "<?= get_candidates()[0]->name ?>" : "<?= get_candidates()[1]->name ?>";
+    var modal_text = (candidate == 1) ? "<?= get_candidates()[0]->bio ?>" : "<?= get_candidates()[1]->bio ?>";
+    var array_text = modal_text.split('.');
     
+    for (let index = 0; index < array_text.length; index++) {
+        if (index == array_text.length - 1) continue;
+        if (index % 2 == 0) array_text[index] = '<div><b>' + array_text[index] + '</b></div>';
+        if (index % 2 != 0) array_text[index] = '<div style="padding-bottom: 0.6em;"><i>' + array_text[index] + '</i></div>';
+    }
+
+    // console.log(array_text);
+    modal.find('.modal-title').html(modal_title);
+    modal.find('.modal-body > p.description').html(array_text);
+    modal.modal('show');
+});
 </script>
 <?= $this->endSection() ?>

@@ -165,10 +165,10 @@ if ( !function_exists('get_votes_blank') ) {
 
 if ( !function_exists('get_votes_candidates') ) {
     function get_votes_candidates() {
-        $builder = new Results();
         $candidates = [1, 2];
-        $results_data = $builder->select('name, candidate_number, COUNT(candidate_number) votes')
-                        ->join('candidates', 'candidate_number', 'left')
+        $builder = new Candidate();
+        $results_data = $builder->select('name, candidate_number, COUNT(results.candidate_number) votes')
+                        ->join('results', 'candidate_number', 'left')
                         ->whereIn('candidate_number', $candidates)
                         ->groupBy('candidate_number')->orderBy('votes', 'DESC');
 

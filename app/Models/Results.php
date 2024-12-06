@@ -12,8 +12,9 @@ class Results extends Model
 
     public function getResultsData() 
     {
+        $candidates = [1, 2];
         $builder = $this->db->table('results');
-        $builder->select('candidate_number, COUNT(candidate_number) total')->groupBy('candidate_number')->orderBy('candidate_number', 'ASC');
+        $builder->select('candidate_number, COUNT(candidate_number) total')->whereIn('candidate_number', $candidates)->groupBy('candidate_number')->orderBy('candidate_number', 'ASC');
 
         return $builder->get()->getResult();
     }
