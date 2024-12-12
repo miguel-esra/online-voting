@@ -30,6 +30,7 @@ $routes->group('', static function($routes) {
         $routes->get('votacion-virtual/administrador/obtener-resultados', 'AdminController::getVotingResults', ['as' => 'get-results']);
         $routes->get('votacion-virtual/administrador/participantes', 'AdminController::participants', ['as' => 'admin.participants']);
         $routes->get('votacion-virtual/administrador/obtener-participantes', 'AdminController::getParticipants', ['as' => 'get-participants']);
+        $routes->get('votacion-virtual/administrador/resultados-elecciones', 'AdminController::resultsPDF', ['as' => 'get-results-pdf']);
     });
 
     $routes->group('', ['filter' => 'cifilter:guestVoter'], static function($routes) {

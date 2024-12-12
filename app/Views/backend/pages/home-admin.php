@@ -6,19 +6,26 @@
 <div class="page-header">
     <div class="row">
         <div class="col-md-12 col-sm-12">
-            <div class="title">
-                <h4>Resultados</h4>
+            <div class="pull-left">
+                <div class="title">
+                    <h4>Resultados</h4>
+                </div>
+                <nav aria-label="breadcrumb" role="navigation">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="<?= route_to('admin.home'); ?>">Inicio</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Resultados
+                        </li>
+                    </ol>
+                </nav>
             </div>
-            <nav aria-label="breadcrumb" role="navigation">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="<?= route_to('admin.home'); ?>">Inicio</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        Resultados
-                    </li>
-                </ol>
-            </nav>
+            <div class="pull-right">
+                <a href="<?= route_to('get-results-pdf'); ?>" target="_blank" class="btn btn-outline-primary btn-sm p-2">
+                    <i class="icon-copy fa fa-file-pdf-o" aria-hidden="true"></i>&ensp;<b>Exportar a PDF</b>
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -26,7 +33,13 @@
 <div class="row clearfix">
     <div class="col-md-12 col-sm-12 mb-20">
         <div class="card text-white bg-info card-box">
-            <div class="card-header"><h5 class="text-white">Elecciones de la Junta Directiva del Sindicato de La Libertad 2025-2026</h5></div>
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-12" style="align-content:center;">
+                        <h5 class="text-white">Elecciones de la Junta Directiva del Sindicato de La Libertad 2025-2026</h5>
+                    </div>
+                </div>
+            </div>
             <div class="card-body">
                 <table class="table table-bordered table-results">
                     <tbody>
