@@ -26,6 +26,10 @@ class CreateVotersTable extends Migration
                 'type' => 'INT',
                 'constraint' => 1
             ],
+            'parent_name' => [
+                'type' => 'VARCHAR',
+                'constraint' => '255'
+            ],
             'status' => [
                 'type' => 'INT',
                 'constraint' => 1

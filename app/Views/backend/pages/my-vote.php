@@ -51,9 +51,9 @@
                 <a href="javascript:;" onclick="event.preventDefault(); document.getElementById('user_profile_file').click();" class="edit-avatar" style="display: none;"><i class="fa fa-pencil"></i></a>
                 <input type="file" name="user_profile_file" id="user_profile_file" class="d-none" style="opacity: 0;">
                 <?php if (!empty(get_voter())) : ?>
-                    <img src="/images/users/default-avatar.png" alt="" class="avatar-photo ci-avatar-photo" />
+                    <img src="/images/users/vote-icon.png" alt="" class="avatar-photo ci-avatar-photo" />
                 <?php else : ?>
-                    <img src="<?= get_user()->picture == null ? '/images/users/default-avatar.png' : '/images/users/' . get_user()->picture ?>" alt="" class="avatar-photo ci-avatar-photo">
+                    <img src="<?= get_user()->picture == null ? '/images/users/vote-icon.png' : '/images/users/' . get_user()->picture ?>" alt="" class="avatar-photo ci-avatar-photo">
                 <?php endif; ?> 
             </div>
             <h5 class="text-center h5 mb-0 ci-user-name">  

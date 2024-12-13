@@ -42,14 +42,14 @@
         <?php endif; ?>
 
         <div class="input-group custom">
-            <input type="number" class="form-control form-control-lg" placeholder="Dígito Verificador" name="check_digit" value="<?= set_value('check_digit') ?>" autocomplete="off">
+            <input type="text" oninput="this.value = this.value.toUpperCase()" class="form-control form-control-lg" placeholder="Nombre del Padre o Madre" name="parent_name" value="<?= set_value('parent_name') ?>" autocomplete="off">
             <div class="input-group-append custom">
                 <span class="input-group-text"><i class="dw dw-padlock1"></i></span>
             </div>
         </div>
-        <?php if($validation->getError('check_digit')) : ?>
+        <?php if($validation->getError('parent_name')) : ?>
             <div class="d-block text-danger" style="margin-top: -25px; margin-bottom: 15px;">
-                <?= $validation->getError('check_digit') ?>
+                <?= $validation->getError('parent_name') ?>
             </div>
         <?php endif; ?>
 

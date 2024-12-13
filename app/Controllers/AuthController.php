@@ -47,11 +47,11 @@ class AuthController extends BaseController
                     'is_not_unique' => 'El número de DNI no se encuentra en el sistema.'
                 ]
             ],
-            'check_digit' => [
-                'rules' => 'required|max_length[1]',
+            'parent_name' => [
+                'rules' => 'required|min_length[3]',
                 'errors' => [
-                    'required' => 'El dígito verificador es obligatorio.',
-                    'max_length' => 'El dígito verificador no debe exceder 1 carácter de longitud.'
+                    'required' => 'El nombre del padre o madre es obligatorio.',
+                    'min_length' => 'El nombre del padre o madre debe contener al menos 3 caracteres de longitud.'
                 ]
             ]
         ]);
@@ -64,22 +64,22 @@ class AuthController extends BaseController
         } else {
             $user = new Voter();
             $userInfo = $user->where('user_id', $this->request->getVar('login_id'))->first();
-            $userDigit = $userInfo['check_digit'];
-            $check_digit = $this->request->getVar('check_digit');
+            $userParent = $userInfo['parent_name'];
+            $parentName = trim($this->request->getVar('parent_name'));
             
             if ( $this->isBlocked()) {
                 return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
             } else {
-                if ( $check_digit != $userDigit ) {
+                if ( $parentName != $userParent ) {
                     $this->loginAttempt();
                     $record = $login_attempt->where('user_id', $this->request->getVar('login_id'))->first();
                     if ($record['attempts'] == 3) {
                         $voter->where('user_id', $this->request->getVar('login_id'))->set(['status' => 0])->update();
                         return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
                     } elseif ($record['attempts'] == 2) {
-                        return redirect()->route('user.login.form')->with('fail', 'El dígito verificador es incorrecto. Queda ' . (3 - $record['attempts']) . ' intento.')->withInput();
+                        return redirect()->route('user.login.form')->with('fail', 'El nombre del padre o madre es incorrecto. Queda ' . (3 - $record['attempts']) . ' intento.')->withInput();
                     } else {
-                        return redirect()->route('user.login.form')->with('fail', 'El dígito verificador es incorrecto. Quedan ' . (3 - $record['attempts']) . ' intentos.')->withInput();
+                        return redirect()->route('user.login.form')->with('fail', 'El nombre del padre o madre es incorrecto. Quedan ' . (3 - $record['attempts']) . ' intentos.')->withInput();
                     }
                 } else {
                     CIAuth::setCIAuthVoter($userInfo);   // important line
