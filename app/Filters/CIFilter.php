@@ -32,6 +32,8 @@ class CIFilter implements FilterInterface
                 return redirect()->route('user.home');
             } elseif ( CIAuth::check() ) {
                 return redirect()->route('admin.home');
+            } elseif ( CIAuth::maintenance() ) {
+                return redirect()->route('user.maintenance');
             }
         }
 
@@ -46,12 +48,20 @@ class CIFilter implements FilterInterface
         if ($arguments[0] == 'authVoter') {
             if ( !CIAuth::checkVoter() ) {
                 return redirect()->route('user.login.form')->with('fail', 'Debes identificarte primero!');
+            } elseif ( CIAuth::maintenance() ) {
+                return redirect()->route('user.maintenance');
             }
         }
 
         if ($arguments[0] == 'authAdmin') {
             if ( !CIAuth::check() ) {
                 return redirect()->route('admin.login.form')->with('fail', 'Debes iniciar sesión primero!');
+            }
+        }
+
+        if ($arguments[0] == 'maintenanceMode') {
+            if ( !CIAuth::maintenance() ) {
+                return redirect()->route('user.login.form');
             }
         }
     }

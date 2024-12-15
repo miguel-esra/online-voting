@@ -5,6 +5,7 @@ namespace App\Libraries;
 use App\Models\Results;
 use App\Models\User;
 use App\Models\Voter;
+use CodeIgniter\I18n\Time;
 
 class CIAuth
 {
@@ -123,4 +124,26 @@ class CIAuth
             return null;
         }
     }
+
+    public static function maintenance()
+    {    
+        $session = session();
+        $session->remove('maintenance_mode');
+        // specific maintenance date and time
+        $scheduled_time =  Time::create(2024, 12, 16, 0, 0, 0, 'America/Lima');
+        $current_time = Time::now('America/Lima');
+        $diff = $current_time->difference($scheduled_time);
+
+        if ( $diff->getSeconds() <= 0 ) {
+            if ( $session->has('logged_in_voter') ) {
+                $session->remove('logged_in_voter');
+                $session->remove('userdata');
+            }
+            $array = ['maintenance_mode' => true];
+            $session->set($array);
+        } 
+
+        return $session->has('maintenance_mode');
+    }
+
 }

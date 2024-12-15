@@ -76,7 +76,7 @@
                     </h5>
                     <p class="text-center text-muted font-14 ci-user-number">
                         <?php if (!empty(get_voter())) : ?>    
-                            <?= 'Lista Inscrita' ?>
+                            <?= 'Lista N° 1 Inscrita' ?>
                         <?php endif; ?>
                     </p>
                 </label>
@@ -109,7 +109,7 @@
                     </h5>
                     <p class="text-center text-muted font-14 ci-user-number">
                         <?php if (!empty(get_voter())) : ?>    
-                            <?= 'Lista Inscrita' ?>
+                            <?= 'Lista N° 2 Inscrita' ?>
                         <?php endif; ?>
                     </p>
                 </label>

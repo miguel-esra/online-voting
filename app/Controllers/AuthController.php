@@ -38,13 +38,20 @@ class AuthController extends BaseController
         $voter = new Voter();
 
         $isValid = $this->validate([
-            'login_id' => [
-                'rules' => 'required|min_length[8]|max_length[8]|is_not_unique[voters.user_id]',
+            'email' => [
+                'rules' => 'trim|required|valid_email|is_not_unique[voters.email]',
                 'errors' => [
-                    'required' => 'El número de DNI es obligatorio.',
-                    'min_length' => 'El número de DNI debe contener al menos 8 caracteres de longitud.',
-                    'max_length' => 'El número de DNI no debe exceder 8 caracteres de longitud.',
-                    'is_not_unique' => 'El número de DNI no se encuentra en el sistema.'
+                    'required' => 'El correo electrónico es obligatorio.',
+                    'valid_email' => 'El correo electrónico no es válido.',
+                    'is_not_unique' => 'El correo electrónico no se encuentra en el sistema.'
+                ]
+            ],
+            'user_id' => [
+                'rules' => 'required|min_length[4]|max_length[4]',
+                'errors' => [
+                    'required' => 'Los últimos 4 dígitos del DNI es obligatorio.',
+                    'min_length' => 'Los últimos 4 dígitos del DNI debe contener al menos 4 caracteres de longitud.',
+                    'max_length' => 'Los últimos 4 dígitos del DNI no debe exceder 4 caracteres de longitud.'
                 ]
             ],
             'parent_name' => [
@@ -63,23 +70,37 @@ class AuthController extends BaseController
             ]);
         } else {
             $user = new Voter();
-            $userInfo = $user->where('user_id', $this->request->getVar('login_id'))->first();
+            $userInfo = $user->where('email', $this->request->getVar('email'))->first();
+            $user_id = $userInfo['user_id'];
             $userParent = $userInfo['parent_name'];
             $parentName = trim($this->request->getVar('parent_name'));
+            $input_last_digits = trim($this->request->getVar('user_id'));
+            $user_id_last_digits = substr($userInfo['user_id'], -4);
             
             if ( $this->isBlocked()) {
                 return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
             } else {
                 if ( $parentName != $userParent ) {
                     $this->loginAttempt();
-                    $record = $login_attempt->where('user_id', $this->request->getVar('login_id'))->first();
+                    $record = $login_attempt->where('user_id', $user_id)->first();
                     if ($record['attempts'] == 3) {
-                        $voter->where('user_id', $this->request->getVar('login_id'))->set(['status' => 0])->update();
+                        $voter->where('user_id', $user_id)->set(['status' => 0])->update();
                         return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
                     } elseif ($record['attempts'] == 2) {
                         return redirect()->route('user.login.form')->with('fail', 'El nombre del padre o madre es incorrecto. Queda ' . (3 - $record['attempts']) . ' intento.')->withInput();
                     } else {
                         return redirect()->route('user.login.form')->with('fail', 'El nombre del padre o madre es incorrecto. Quedan ' . (3 - $record['attempts']) . ' intentos.')->withInput();
+                    }
+                } elseif ( $input_last_digits != $user_id_last_digits) {
+                    $this->loginAttempt();
+                    $record = $login_attempt->where('user_id', $user_id)->first();
+                    if ($record['attempts'] == 3) {
+                        $voter->where('user_id', $user_id)->set(['status' => 0])->update();
+                        return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
+                    } elseif ($record['attempts'] == 2) {
+                        return redirect()->route('user.login.form')->with('fail', 'Los últimos 4 dígitos del DNI son incorrectos. Queda ' . (3 - $record['attempts']) . ' intento.')->withInput();
+                    } else {
+                        return redirect()->route('user.login.form')->with('fail', 'Los últimos 4 dígitos del DNI son incorrectos. Quedan ' . (3 - $record['attempts']) . ' intentos.')->withInput();
                     }
                 } else {
                     CIAuth::setCIAuthVoter($userInfo);   // important line
@@ -94,7 +115,8 @@ class AuthController extends BaseController
     {
         $login_attempt = new LoginAttempt();
         $voter = new Voter();
-        $user_id = $this->request->getVar('login_id');
+        $email = trim($this->request->getVar('email'));
+        $user_id = $voter->where('email', $email)->first()['user_id'];
 
         // If the user logged in with success
         if ( $passed ) :
@@ -133,7 +155,8 @@ class AuthController extends BaseController
     {
         $login_attempt = new LoginAttempt();
         $voter = new Voter();
-        $user_id = $this->request->getVar('login_id');
+        $email = trim($this->request->getVar('email'));
+        $user_id = $voter->where('email', $email)->first()['user_id'];
 
         // Time that a user gets blocked
         $blockTime = 1800;
@@ -234,6 +257,16 @@ class AuthController extends BaseController
                 return redirect()->route('admin.home');
             }
         }
+    }
+
+    public function maintenance() 
+    {
+        $data = [
+            'pageTitle' => 'Votación Virtual',
+            'validation' => null
+        ];
+
+        return view('maintenance', $data);
     }
 
 }

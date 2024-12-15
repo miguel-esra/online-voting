@@ -711,7 +711,8 @@ class AdminController extends BaseController
             $pdf->text(543, 796, $text, \'Helvetica\', 7, array(0,0,0));
         ');
 
-        $dompdf->stream("elecciones-junta-directiva-" . $current_time . ".pdf", array("Attachment" => false));
+        // $dompdf->stream("elecciones-junta-directiva-" . $current_time . ".pdf", array("Attachment" => false));
+        $dompdf->stream("elecciones-junta-directiva-" . $current_time . ".pdf");
     }
 
 }

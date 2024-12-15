@@ -28,23 +28,23 @@
                 </button>
             </div>
         <?php endif;?>
-
+        
         <div class="input-group custom">
-            <input type="number" class="form-control form-control-lg" placeholder="Número de DNI" name="login_id" value="<?= set_value('login_id') ?>">
+            <input type="text" class="form-control form-control-lg" placeholder="Correo electrónico" name="email" value="<?= set_value('email') ?>">
             <div class="input-group-append custom">
-                <span class="input-group-text"><i class="icon-copy dw dw-user1"></i></span>
+                <span class="input-group-text"><i class="icon-copy dw dw-email-1"></i></span>
             </div>
         </div>
-        <?php if($validation->getError('login_id')) : ?>
+        <?php if($validation->getError('email')) : ?>
             <div class="d-block text-danger" style="margin-top: -25px; margin-bottom: 15px;">
-                <?= $validation->getError('login_id') ?>
+                <?= $validation->getError('email') ?>
             </div>
         <?php endif; ?>
-
+        
         <div class="input-group custom">
             <input type="text" oninput="this.value = this.value.toUpperCase()" class="form-control form-control-lg" placeholder="Nombre del Padre o Madre" name="parent_name" value="<?= set_value('parent_name') ?>" autocomplete="off">
             <div class="input-group-append custom">
-                <span class="input-group-text"><i class="dw dw-padlock1"></i></span>
+                <span class="input-group-text"><i class="dw dw-user1"></i></span>
             </div>
         </div>
         <?php if($validation->getError('parent_name')) : ?>
@@ -52,6 +52,19 @@
                 <?= $validation->getError('parent_name') ?>
             </div>
         <?php endif; ?>
+
+        <div class="input-group custom">
+            <input type="password" class="form-control form-control-lg" placeholder="Últimos 4 dígitos del DNI" name="user_id" value="<?= set_value('user_id') ?>">
+            <div class="input-group-append custom">
+                <span class="input-group-text"><i class="icon-copy dw dw-padlock1"></i></span>
+            </div>
+        </div>
+        <?php if($validation->getError('user_id')) : ?>
+            <div class="d-block text-danger" style="margin-top: -25px; margin-bottom: 15px;">
+                <?= $validation->getError('user_id') ?>
+            </div>
+        <?php endif; ?>
+        
 
         <div class="row">
             <div class="col-sm-12">

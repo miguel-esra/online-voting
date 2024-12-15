@@ -18,6 +18,10 @@ class CreateVotersTable extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => '255'
             ],
+            'email' => [
+                'type' => 'VARCHAR',
+                'constraint' => '255'
+            ],
             'user_id' => [
                 'type' => 'VARCHAR',
                 'constraint' => '8'

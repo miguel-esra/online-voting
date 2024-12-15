@@ -60,7 +60,13 @@
                 <?= get_voter_choice_details()->name ?>
             </h5>
             <p class="text-center text-muted font-14 ci-user-number">
-                <?= ( get_voter_choice_details()->candidate_number == 3 ) ? 'Voto en blanco' : 'Lista Inscrita' ?>
+                <?php if ( get_voter_choice_details()->candidate_number == 1 ) : ?> 
+                    Lista N° 1 Inscrita
+                <?php elseif ( get_voter_choice_details()->candidate_number == 2 ) : ?> 
+                    Lista N° 2 Inscrita
+                <?php else : ?> 
+                    Voto en blanco
+                <?php endif; ?> 
             </p>
             <?php if ( get_voter_choice_details()->candidate_number == 3 ) : ?>
                 <div style="display: none;"></div>
