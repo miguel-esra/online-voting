@@ -10,7 +10,7 @@ class Candidate extends Model
     protected $primaryKey       = 'id';
     protected $allowedFields    = ['name', 'candidate_number', 'candidate_id', 'picture', 'bio'];
 
-    public function getCandidatesData() 
+    public function getCandidatesData()
     {
         $candidates = [1, 2];
         $builder = $this->db->table('candidates');

@@ -177,8 +177,12 @@
 <?= $this->section('scripts') ?>
 
 <script>
+var lastCandidateBtn = null;
+
 $(document).on('click', '.candidate_details_btn', function (e) {
     e.preventDefault();
+    lastCandidateBtn = this;                        
+
     var modal = $('body').find('div#candidate-details-modal');
     var candidate = $(this).data("candidate");
     var modal_title = (candidate == 1) ? "<?= get_candidates()[0]->name ?>" : "<?= get_candidates()[1]->name ?>";
@@ -197,12 +201,36 @@ $(document).on('click', '.candidate_details_btn', function (e) {
     modal.modal('show');
 });
 
+// Evita la advertencia "Blocked aria-hidden on an element because its descendant retained focus"
+$('#candidate-details-modal').on('hide.bs.modal', function () {
+    if (document.activeElement && this.contains(document.activeElement)) {
+        document.activeElement.blur();
+    }
+});
+
+// Devuelve el foco al botón que abrió el modal
+$('#candidate-details-modal').on('hidden.bs.modal', function () {
+    if (lastCandidateBtn && document.body.contains(lastCandidateBtn)) {
+        lastCandidateBtn.focus();
+    }
+    lastCandidateBtn = null;
+});
+
+var isSubmittingVote = false;
+
 $(document).on('click', '#cast_vote_btn', function (e) {
     e.preventDefault();
+
+    if (isSubmittingVote) {
+        return;
+    }
+
+    var $btn = $(this);
     var candidate_number = $('input[name="radio_candidate"]:checked').val();
     var candidate_name = $('input[name="radio_candidate"]:checked').next().find('.ci-user-name').text();
     var url = "<?= route_to('user.add-vote') ?>";
     var urlRedirect = "<?= route_to('user.my.vote') ?>";
+
     if (candidate_number) {
         toastr.remove();
         swal.fire({
@@ -219,6 +247,12 @@ $(document).on('click', '#cast_vote_btn', function (e) {
             allowOutsideClick: false
         }).then(function (result) {
             if (result.value) {
+                isSubmittingVote = true;
+                $btn
+                    .addClass('disabled')
+                    .css('pointer-events', 'none')
+                    .attr('aria-disabled', 'true')
+
                 $.post(url, { candidate_number: candidate_number }, function (response) {
                     if ( response.status == 1) {
                         swal.fire({
@@ -230,9 +264,23 @@ $(document).on('click', '#cast_vote_btn', function (e) {
                             window.location.href = urlRedirect; 
                         });
                     } else {
+                        isSubmittingVote = false;
+                        $btn
+                            .removeClass('disabled')
+                            .css('pointer-events', '')
+                            .removeAttr('aria-disabled')
+
                         toastr.error(response.msg).css("width", "100%").css("font-size", "12pt");
                     }
-                }, 'json');
+                }, 'json').fail(function () {
+                    isSubmittingVote = false;
+                    $btn
+                        .removeClass('disabled')
+                        .css('pointer-events', '')
+                        .removeAttr('aria-disabled')
+
+                    toastr.error('No se pudo completar el voto. Intente nuevamente.').css("width", "100%").css("font-size", "12pt");
+                });
             } else {
                 swal.close();
             }

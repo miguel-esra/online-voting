@@ -130,7 +130,7 @@ class CIAuth
         $session = session();
         $session->remove('maintenance_mode');
         // specific maintenance date and time
-        $scheduled_time =  Time::create(2025, 12, 16, 17, 0, 0, 'America/Lima');
+        $scheduled_time =  Time::create(2027, 12, 25, 17, 0, 0, 'America/Lima');
         $current_time = Time::now('America/Lima');
         $diff = $current_time->difference($scheduled_time);
 

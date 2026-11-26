@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Libraries\CIAuth;
 use App\Models\User;
@@ -20,6 +21,7 @@ use SawaStacks\CodeIgniter\Slugify;
 class AdminController extends BaseController
 {
     protected $helpers = ['url', 'form', 'CIMail', 'CIFunctions'];
+    /** @var BaseConnection */
     protected $db;
 
     public function __construct()
@@ -577,15 +579,30 @@ class AdminController extends BaseController
             $total_valid_votes_pct = $zero;
             $total_valid_votes_pct_casted = $zero;
         }
-        
+
         $current_time = Time::now('America/Lima')->format('YmdHis');
         $string_time = "ACTUALIZADO EL " . Time::now('America/Lima')->format('d/m/Y') . " A LAS " . Time::now('America/Lima')->format('H:i');
+
+        $logoPath = FCPATH . 'images/blog/logo-sindicato-pdf.png';
+        $logoSrc = '';
+
+        if (is_file($logoPath)) {
+            $mimeType = mime_content_type($logoPath) ?: 'image/png';
+            $logoData = base64_encode(file_get_contents($logoPath));
+            $logoSrc = 'data:' . $mimeType . ';base64,' . $logoData;
+        }
+
+        $logoHtml = $logoSrc !== ''
+            ? '<img src="' . $logoSrc . '" alt="logo-sindicato" height="60" style="padding-bottom:3px;">'
+            : '';
 
         $dompdf = new Dompdf();
         
         $dompdf->loadHtml(
-            '<html>
+            '<!DOCTYPE html>
+            <html>
                 <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
                     <style>
                         @page {
                             margin: 128px 50px 80px 50px;
@@ -607,7 +624,7 @@ class AdminController extends BaseController
                         <div style="width:98%; height:100%; margin:auto; border-bottom: 1.5px solid #99B1D5;">
                             <div style="display:table; float:left; height:100%;">
                                 <div style="display:table-cell; vertical-align:bottom; width:40%; height:100%;">
-                                    <img src="' . ImageToDataUrl('images/blog/logo-sindicato-pdf.png') . '" alt="logo-sindicato" height="60" style="padding-bottom:3px;">
+                                    ' . $logoHtml . '
                                 </div>
                             </div>
                             <div style="display:table; float:right; width:60%; height:100%; text-align:right;">
