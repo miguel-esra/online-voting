@@ -1,16 +1,18 @@
 <?php
+
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 /** Send Email Function Using PHPMailer Library */
 
 if (!function_exists('sendEmail')) {
-    function sendEmail($mailConfig) {
+    function sendEmail(array $mailConfig): bool
+    {
         require 'PHPMailer/src/Exception.php';
         require 'PHPMailer/src/PHPMailer.php';
         require 'PHPMailer/src/SMTP.php';
 
         $mail = new PHPMailer(true);
+        $mail->CharSet = PHPMailer::CHARSET_UTF8;
         $mail->SMTPDebug = 0;
         $mail->isSMTP();
         $mail->Host = env('EMAIL_HOST');
@@ -24,11 +26,7 @@ if (!function_exists('sendEmail')) {
         $mail->isHTML(true);
         $mail->Subject = $mailConfig['mail_subject'];
         $mail->Body = $mailConfig['mail_body'];
-        if ( $mail->send() ) {
-            return true;
-        } else {
-            return false;
-        }
 
+        return (bool) $mail->send();
     }
 }

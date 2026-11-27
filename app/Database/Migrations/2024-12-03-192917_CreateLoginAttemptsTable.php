@@ -12,15 +12,20 @@ class CreateLoginAttemptsTable extends Migration
             'id' => [
                 'type' => 'INT',
                 'unsigned' => true,
-                'auto_increment' => true
+                'auto_increment' => true,
+            ],
+            'email' => [
+                'type' => 'VARCHAR',
+                'constraint' => '255',
             ],
             'user_id' => [
                 'type' => 'VARCHAR',
-                'constraint' => '8'
+                'constraint' => '8',
+                'null' => true,
             ],
             'attempts' => [
                 'type' => 'INT',
-                'constraint' => 1
+                'constraint' => 1,
             ],
             'timestamp timestamp default current_timestamp'
         ]);

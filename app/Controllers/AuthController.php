@@ -19,10 +19,9 @@ use Config\Services;
 
 class AuthController extends BaseController
 {
-    // protected $helpers = ['url', 'form', 'CIMail', 'CIFunctions'];
-    protected $helpers = ['url', 'form', 'CIFunctions'];
+    protected $helpers = ['url', 'form', 'CIMail', 'CIFunctions'];
 
-    public function loginUser() 
+    public function loginUser()
     {
         $data = [
             'pageTitle' => 'Votación Virtual',
@@ -35,7 +34,6 @@ class AuthController extends BaseController
     public function loginHandlerUser()
     {
         $login_attempt = new LoginAttempt();
-        $voter = new Voter();
 
         $isValid = $this->validate([
             'email' => [
@@ -46,93 +44,76 @@ class AuthController extends BaseController
                     'is_not_unique' => 'El correo electrónico no se encuentra en el sistema.'
                 ]
             ],
-            'user_id' => [
-                'rules' => 'required|min_length[4]|max_length[4]',
+            'user_password' => [
+                'rules' => 'required|min_length[6]|max_length[45]',
                 'errors' => [
-                    'required' => 'Los últimos 4 dígitos del DNI es obligatorio.',
-                    'min_length' => 'Los últimos 4 dígitos del DNI debe contener al menos 4 caracteres de longitud.',
-                    'max_length' => 'Los últimos 4 dígitos del DNI no debe exceder 4 caracteres de longitud.'
-                ]
-            ],
-            'parent_name' => [
-                'rules' => 'required|min_length[3]',
-                'errors' => [
-                    'required' => 'El nombre del padre o madre es obligatorio.',
-                    'min_length' => 'El nombre del padre o madre debe contener al menos 3 caracteres de longitud.'
+                    'required' => 'La contraseña es obligatoria.',
+                    'min_length' => 'La contraseña debe contener al menos 6 caracteres de longitud.',
+                    'max_length' => 'La contraseña no debe exceder 45 caracteres de longitud.'
                 ]
             ]
         ]);
-        
+
         if (!$isValid) {
             return view('backend/pages/auth/loginUser', [
                 'pageTitle' => 'Votación Virtual',
                 'validation' => $this->validator
             ]);
         } else {
-            $user = new Voter();
-            $userInfo = $user->where('email', $this->request->getVar('email'))->first();
-            $user_id = $userInfo['user_id'];
-            $userParent = $userInfo['parent_name'];
-            $parentName = trim($this->request->getVar('parent_name'));
-            $input_last_digits = trim($this->request->getVar('user_id'));
-            $user_id_last_digits = substr($userInfo['user_id'], -4);
-            
-            if ( $this->isBlocked()) {
-                return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
+            $voter = new Voter();
+            $userInfo = $voter->where('email', $this->request->getVar('email'))->first();
+            $email = $userInfo['email'];
+            $check_password = Hash::check($this->request->getVar('user_password'), $userInfo['user_password']);
+
+            if ($this->isBlocked()) {
+                return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 5 minutos.')->withInput();
             } else {
-                if ( $parentName != $userParent ) {
+                if ($userInfo['user_password'] === "") {
+                    return redirect()->route('user.login.form')->with('fail', 'Usuario no encontrado. Debe registrarse primero.')->withInput();
+                }
+
+                if (!$check_password) {
                     $this->loginAttempt();
-                    $record = $login_attempt->where('user_id', $user_id)->first();
+                    $record = $login_attempt->where('email', $email)->first();
+
                     if ($record['attempts'] == 3) {
-                        $voter->where('user_id', $user_id)->set(['status' => 0])->update();
-                        return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
+                        $voter->where('email', $email)->set(['status' => 0])->update();
+                        return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 5 minutos.')->withInput();
                     } elseif ($record['attempts'] == 2) {
-                        return redirect()->route('user.login.form')->with('fail', 'El nombre del padre o madre es incorrecto. Queda ' . (3 - $record['attempts']) . ' intento.')->withInput();
+                        return redirect()->route('user.login.form')->with('fail', 'La contraseña es incorrecta. Queda ' . (3 - $record['attempts']) . ' intento.')->withInput();
                     } else {
-                        return redirect()->route('user.login.form')->with('fail', 'El nombre del padre o madre es incorrecto. Quedan ' . (3 - $record['attempts']) . ' intentos.')->withInput();
-                    }
-                } elseif ( $input_last_digits != $user_id_last_digits) {
-                    $this->loginAttempt();
-                    $record = $login_attempt->where('user_id', $user_id)->first();
-                    if ($record['attempts'] == 3) {
-                        $voter->where('user_id', $user_id)->set(['status' => 0])->update();
-                        return redirect()->route('user.login.form')->with('fail', 'Usuario bloqueado. Intente nuevamente en 30 minutos.')->withInput();
-                    } elseif ($record['attempts'] == 2) {
-                        return redirect()->route('user.login.form')->with('fail', 'Los últimos 4 dígitos del DNI son incorrectos. Queda ' . (3 - $record['attempts']) . ' intento.')->withInput();
-                    } else {
-                        return redirect()->route('user.login.form')->with('fail', 'Los últimos 4 dígitos del DNI son incorrectos. Quedan ' . (3 - $record['attempts']) . ' intentos.')->withInput();
+                        return redirect()->route('user.login.form')->with('fail', 'La contraseña es incorrecta. Quedan ' . (3 - $record['attempts']) . ' intentos.')->withInput();
                     }
                 } else {
                     CIAuth::setCIAuthVoter($userInfo);   // important line
-                    $this->loginAttempt( true );
+                    $this->loginAttempt(true);
                     return redirect()->route('user.home');
                 }
             }
-        } 
+        }
     }
 
-    private function loginAttempt( $passed = false )
+    private function loginAttempt($passed = false)
     {
         $login_attempt = new LoginAttempt();
         $voter = new Voter();
         $email = trim($this->request->getVar('email'));
-        $user_id = $voter->where('email', $email)->first()['user_id'];
 
         // If the user logged in with success
-        if ( $passed ) :
+        if ($passed) :
             // Clear this user loginAttempts
-            $login_attempt->where('user_id', $user_id)->set(['attempts' => 0, 'timestamp' => Time::now('America/Lima')])->update();
-            $voter->where('user_id', $user_id)->set(['status' => 1])->update();
- 
+            $login_attempt->where('email', $email)->set(['attempts' => 0, 'timestamp' => Time::now('America/Lima')])->update();
+            $voter->where('email', $email)->set(['status' => 1])->update();
+
         // This is a failed login attempt
         else :
             // Check if we have the user record
-            $record = $login_attempt->where('user_id', $user_id)->first();
+            $record = $login_attempt->where('email', $email)->first();
 
-            if ( empty( $record ) ) :
+            if (empty($record)) :
                 // Create the user record
                 $data = [
-                    'user_id' => $user_id,
+                    'email' => $email,
                     'attempts' => 1,
                     'timestamp' => Time::now('America/Lima')
                 ];
@@ -141,13 +122,13 @@ class AuthController extends BaseController
             // Check if the user needs to be blocked
             else :
                 // The user exceeded the login attempts
-                if ( $record['attempts'] < 3 ):
+                if ($record['attempts'] < 3):
                     // Update the user record
-                    $login_attempt->where('user_id', $user_id)->set(['attempts' => ($record['attempts'] + 1), 'timestamp' => Time::now('America/Lima')])->update();
+                    $login_attempt->where('email', $email)->set(['attempts' => ($record['attempts'] + 1), 'timestamp' => Time::now('America/Lima')])->update();
                 endif;
             endif;
         endif;
- 
+
         return true;
     }
 
@@ -156,25 +137,24 @@ class AuthController extends BaseController
         $login_attempt = new LoginAttempt();
         $voter = new Voter();
         $email = trim($this->request->getVar('email'));
-        $user_id = $voter->where('email', $email)->first()['user_id'];
 
         // Time that a user gets blocked
-        $blockTime = 1800;
- 
+        $blockTime = 300;
+
         // Check if we have the user record
-        $record = $login_attempt->where('user_id', $user_id)->first();
-        if ( !empty( $record ) ) :
+        $record = $login_attempt->where('email', $email)->first();
+        if (!empty($record)) :
             // Check this user login attempts
-            if ( $record['attempts'] >= 3 ) :
+            if ($record['attempts'] >= 3) :
                 // Check if the user block time has expired
                 $record_timestamp = Time::parse($record['timestamp'], 'America/Lima');
                 $current_timestamp = Time::now('America/Lima');
                 $diff = $record_timestamp->difference($current_timestamp);
-                
-                if ( $diff->getSeconds() > $blockTime ) :
+
+                if ($diff->getSeconds() > $blockTime) :
                     // User is not blocked anymore and clear login attempts
-                    $login_attempt->where('user_id', $user_id)->set(['attempts' => 0, 'timestamp' => Time::now('America/Lima')])->update();
-                    $voter->where('user_id', $user_id)->set(['status' => 1])->update();
+                    $login_attempt->where('email', $email)->set(['attempts' => 0, 'timestamp' => Time::now('America/Lima')])->update();
+                    $voter->where('email', $email)->set(['status' => 1])->update();
                     return false;
                 else :
                     // The user is blocked
@@ -182,7 +162,7 @@ class AuthController extends BaseController
                 endif;
             endif;
         endif;
- 
+
         // The user is not blocked
         return false;
     }
@@ -251,7 +231,7 @@ class AuthController extends BaseController
             $check_password = Hash::check($this->request->getVar('password'), $userInfo['password']);
 
             if (!$check_password) {
-                return redirect()->route('admin.login.form')->with('fail','Contraseña incorrecta.')->withInput();
+                return redirect()->route('admin.login.form')->with('fail', 'Contraseña incorrecta.')->withInput();
             } else {
                 CIAuth::setCIAuth($userInfo);   // important line
                 return redirect()->route('admin.home');
@@ -259,7 +239,185 @@ class AuthController extends BaseController
         }
     }
 
-    public function maintenance() 
+    public function forgotForm()
+    {
+        $data = [
+            'pageTitle' => 'Votación Virtual',
+            'validation' => null
+        ];
+
+        return view('backend/pages/auth/forgot', $data);
+    }
+
+    public function sendPasswordResetLink()
+    {
+        $isValid = $this->validate([
+            'email' => [
+                'rules' => 'trim|required|valid_email|is_not_unique[voters.email]',
+                'errors' => [
+                    'required' => 'El correo electrónico es obligatorio.',
+                    'valid_email' => 'El correo electrónico no es válido.',
+                    'is_not_unique' => 'El correo electrónico no tiene permitido participar en estas elecciones.'
+                ]
+            ],
+
+        ]);
+
+        if (!$isValid) {
+            return view('backend/pages/auth/forgot', [
+                'pageTitle' => 'Votación Virtual',
+                'validation' => $this->validator,
+            ]);
+        } else {
+            // Get voter details
+            $voter = new Voter();
+            $user_info = $voter->asObject()->where('email', $this->request->getVar('email'))->first();
+
+            if ($user_info->user_password === "") {
+                return redirect()->route('user.forgot.form')->with('fail', 'Usuario no encontrado. Debe registrarse primero.')->withInput();
+            }
+
+            // Generate token
+            $token = bin2hex(openssl_random_pseudo_bytes(65));
+
+            // Get reset password token
+            $password_reset_token = new PasswordResetToken();
+            $isOldTokenExists = $password_reset_token->asObject()->where('email', $user_info->email)->first();
+
+            if ($isOldTokenExists) {
+                // Update existing token
+                $password_reset_token->where('email', $user_info->email)->set(['token' => $token, 'created_at' => Carbon::now()])->update();
+            } else {
+                $password_reset_token->insert(['email' => $user_info->email, 'token' => $token, 'created_at' => Carbon::now()]);
+            }
+        }
+
+        // Create action link
+        $actionLink = base_url(route_to('user.reset-password', $token));
+
+        $mail_data = [
+            'actionLink' => $actionLink,
+            'user' => $user_info,
+        ];
+
+        $mail_body = view('email-templates/forgot-email-template', ['mail_data' => $mail_data]);
+
+        $mailConfig = array(
+            'mail_from_email' => env('EMAIL_FROM_ADDRESS'),
+            'mail_from_name' => env('EMAIL_FROM_NAME'),
+            'mail_recipient_email' => $user_info->email,
+            'mail_recipient_name' => $user_info->name,
+            'mail_subject' => 'Restablecer Contraseña - Sistema de Votación Virtual',
+            'mail_body' => $mail_body
+        );
+
+        // Send email
+        if (sendEmail($mailConfig)) {
+            return redirect()->route('user.forgot.form')->with('success', 'Se ha enviado el enlace de recuperación a su correo electrónico.');
+        } else {
+            return redirect()->route('user.forgot.form')->with('fail', 'Algo salió mal. Vuelve a intentarlo más tarde.');
+        }
+    }
+
+    public function resetPassword(string $token)
+    {
+        $passwordResetToken = new PasswordResetToken();
+        $check_token = $passwordResetToken->asObject()->where('token', $token)->first();
+
+        if (!$check_token) {
+            return redirect()->route('user.forgot.form')->with('fail', 'Token inválido. Solicita otro enlace para restablecer la contraseña.');
+        } else {
+            // Check if token has not expired (Not older than 15 minutes)
+            $diffMins = Carbon::createFromFormat('Y-m-d H:i:s', $check_token->created_at)->diffInMinutes(Carbon::now());
+
+            if ($diffMins > 15) {
+                // If token expired (older than 15 minutes)
+                return redirect()->route('user.forgot.form')->with('fail', 'Token inválido. Solicita otro enlace para restablecer la contraseña.');
+            } else {
+                return view('backend/pages/auth/reset', [
+                    'pageTitle' => 'Votación Virtual',
+                    'validation' => null,
+                    'token' => $token
+                ]);
+            }
+        }
+    }
+
+    public function resetPasswordHandler(string $token)
+    {
+        $isValid = $this->validate([
+            'new_password' => [
+                'rules' => 'required|min_length[6]|max_length[45]|is_password_strong[new_password]',
+                'errors' => [
+                    'required' => 'La nueva contraseña es obligatoria.',
+                    'min_length' => 'La contraseña debe contener al menos 6 caracteres de longitud.',
+                    'max_length' => 'La contraseña no debe exceder 45 caracteres de longitud.',
+                    'is_password_strong' => 'La nueva contraseña debe contener al menos 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial.',
+                ]
+            ],
+            'confirm_new_password' => [
+                'rules' => 'required|matches[new_password]',
+                'errors' => [
+                    'required' => 'Confirma la nueva contraseña.',
+                    'matches' => 'Las contraseñas no coinciden.',
+                ]
+            ]
+        ]);
+
+        if (!$isValid) {
+            return view('backend/pages/auth/reset', [
+                'pageTitle' => 'Votación Virtual',
+                'validation' => null,
+                'token' => $token,
+            ]);
+        } else {
+            // Get token details
+            $passwordResetToken = new PasswordResetToken();
+            $get_token = $passwordResetToken->asObject()->where('token', $token)->first();
+
+            // Get voter details
+            $voter = new Voter();
+            $user_info = $voter->asObject()->where('email', $get_token->email)->first();
+
+            if (!$get_token) {
+                return redirect()->back()->with('fail', '¡Token inválido. Vuelve a iniciar el restablecimiento.!')->withInput();
+            } else {
+                // Update admin password in DB
+                $voter->where('email', $user_info->email)->set(['user_password' => Hash::make($this->request->getVar('new_password'))])->update();
+
+                //Send notification to user (admin) email address
+                $mail_data = array(
+                    'user' => $user_info,
+                    'new_password' => $this->request->getVar('new_password')
+                );
+
+                $view = \Config\Services::renderer();
+                $mail_body = $view->setVar('mail_data', $mail_data)->render('email-templates/password-changed-email-template');
+
+                $mailConfig = array(
+                    'mail_from_email' => env('EMAIL_FROM_ADDRESS'),
+                    'mail_from_name' => env('EMAIL_FROM_NAME'),
+                    'mail_recipient_email' => $user_info->email,
+                    'mail_recipient_name' => $user_info->name,
+                    'mail_subject' => 'Contraseña Actualizada - Sistema de Votación Virtual',
+                    'mail_body' => $mail_body
+                );
+
+                // Send email
+                if (sendEmail($mailConfig)) {
+                    // Delete token
+                    $passwordResetToken->where('email', $user_info->email)->delete();
+
+                    // Redirect and display message on login page
+                    return redirect()->route('user.login.form')->with('success', '¡Tu contraseña ha sido cambiada! Utiliza la nueva contraseña para iniciar sesión.');
+                } else {
+                    return redirect()->back()->with('fail', 'Algo salió mal. Vuelve a intentarlo más tarde.')->withInput();
+                }
+            }
+        }
+    }
+
+    public function maintenance()
     {
         $data = [
             'pageTitle' => 'Votación Virtual',
@@ -268,5 +426,4 @@ class AuthController extends BaseController
 
         return view('maintenance', $data);
     }
-
 }

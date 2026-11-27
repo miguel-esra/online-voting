@@ -36,6 +36,10 @@ $routes->group('', static function($routes) {
     $routes->group('', ['filter' => 'cifilter:guestVoter'], static function($routes) {
         $routes->get('elecciones', 'AuthController::loginUser', ['as' => 'user.login.form']);
         $routes->post('elecciones', 'AuthController::loginHandlerUser', ['as' => 'user.login.handler']);
+        $routes->get('elecciones/clave-olvidada', 'AuthController::forgotForm', ['as' => 'user.forgot.form']);
+        $routes->post('elecciones/enlace-restablecer-clave', 'AuthController::sendPasswordResetLink', ['as' => 'send_password_reset_link']);
+        $routes->get('elecciones/clave/restablecer/(:any)', 'AuthController::resetPassword/$1', ['as' => 'user.reset-password']);
+        $routes->post('elecciones/gestor-restablecimiento-clave/(:any)', 'AuthController::resetPasswordHandler/$1', ['as' => 'reset-password-handler']);
     });
 
     $routes->group('', ['filter' => 'cifilter:guestAdmin'], static function($routes) {

@@ -8,5 +8,5 @@ class LoginAttempt extends Model
 {
     protected $table            = 'login_attempts';
     protected $primaryKey       = 'id';
-    protected $allowedFields    = ['user_id', 'attempts', 'timestamp'];
+    protected $allowedFields    = ['email', 'user_id', 'attempts', 'timestamp'];
 }
