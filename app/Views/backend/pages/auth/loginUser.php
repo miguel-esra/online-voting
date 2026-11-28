@@ -67,10 +67,21 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-12">
+        
+        <div class="row align-items-center pt-10">
+            <div class="col-5">
                 <div class="input-group mb-0">
-                    <input class="btn btn-primary btn-lg btn-block" type="submit" value="Ingresar">
+                    <input class="btn btn-primary btn-lg btn-block px-0" type="submit" value="Ingresar">
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="font-16 weight-600 text-center" data-color="#707373" style="color: rgb(112, 115, 115);">
+                    O
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="input-group mb-0">
+                    <a class="btn btn-outline-primary btn-lg btn-block px-0" href="<?= route_to('user.register.form') ?>">Regístrate</a>
                 </div>
             </div>
         </div>
